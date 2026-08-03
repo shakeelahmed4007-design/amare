@@ -69,25 +69,10 @@ export default function Product({ onAddToCart }) {
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 py-8">
         <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-start">
           
-          {/* Left Column: Vertical Thumbnails Gallery */}
-          <div className="w-full lg:w-1/2 flex flex-col-reverse sm:flex-row gap-4">
-            {/* Vertical Thumbnails */}
-            <div className="flex sm:flex-col gap-3 overflow-x-auto sm:overflow-y-auto no-scrollbar max-h-[500px]">
-              {galleryImages.map((img, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setActiveImage(img)}
-                  className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 bg-neutral-50 ${
-                    activeImage === img ? 'border-black ring-2 ring-black/10' : 'border-neutral-200 hover:border-neutral-400'
-                  }`}
-                >
-                  <img src={img} alt="Thumbnail" className="w-full h-full object-cover" />
-                </button>
-              ))}
-            </div>
-
+          {/* Left Column: Image Gallery (Thumbnails below) */}
+          <div className="w-full lg:w-1/2 flex flex-col gap-4">
             {/* Main Featured Image Container */}
-            <div className="relative flex-1 aspect-square rounded-2xl overflow-hidden bg-neutral-50 border border-neutral-200 flex items-center justify-center">
+            <div className="relative w-full aspect-square rounded-2xl overflow-hidden flex items-center justify-center">
               {product.badge && (
                 <div className="absolute top-4 left-4 z-10">
                   <span className="bg-blue-600 text-white text-xs font-black tracking-wider uppercase px-3 py-1.5 rounded-full shadow-md">
@@ -100,6 +85,21 @@ export default function Product({ onAddToCart }) {
                 alt={product.title} 
                 className="w-full h-full object-cover transition-all duration-300"
               />
+            </div>
+
+            {/* Horizontal Thumbnails Row */}
+            <div className="flex flex-row gap-3 overflow-x-auto no-scrollbar py-1">
+              {galleryImages.map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveImage(img)}
+                  className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 bg-neutral-50 ${
+                    activeImage === img ? 'border-black ring-2 ring-black/10' : 'border-neutral-200 hover:border-neutral-400'
+                  }`}
+                >
+                  <img src={img} alt="Thumbnail" className="w-full h-full object-cover" />
+                </button>
+              ))}
             </div>
           </div>
 

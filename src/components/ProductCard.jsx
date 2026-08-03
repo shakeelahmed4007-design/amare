@@ -46,7 +46,7 @@ export default function ProductCard({ product, onAddToCart, className = "" }) {
 
       {/* Top Product Image */}
       <Link to={`/product/${product.id}`} className="block relative z-10 w-full mb-3">
-        <div className="relative w-full h-[220px] sm:h-[240px] bg-neutral-50 rounded-lg overflow-hidden border border-neutral-100 flex items-center justify-center">
+        <div className="relative w-full h-[220px] sm:h-[240px] rounded-lg overflow-hidden flex items-center justify-center">
           <img 
             src={product.image} 
             alt={product.title} 
