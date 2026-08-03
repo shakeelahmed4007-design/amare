@@ -33,7 +33,7 @@ export default function ProductCard({ product, onAddToCart, className = "" }) {
     setTimeout(() => setAdded(false), 1500);
   };
 
-  const cardClasses = `bg-white rounded-xl border border-neutral-200 p-3.5 sm:p-4 flex flex-col justify-between h-full group transition-all duration-200 hover:border-neutral-400 relative select-none cursor-pointer ${className || 'min-w-[210px] w-[210px] sm:min-w-[230px] sm:w-[230px] lg:min-w-[245px] lg:w-[245px] flex-shrink-0'
+  const cardClasses = `bg-white rounded-2xl border border-neutral-100 p-4 sm:p-5 flex flex-col justify-between h-full group transition-all duration-300 hover:border-neutral-300 hover:shadow-[0_20px_45px_rgba(0,0,0,0.05)] hover:-translate-y-1 relative select-none cursor-pointer ${className || 'min-w-[210px] w-[210px] sm:min-w-[230px] sm:w-[230px] lg:min-w-[245px] lg:w-[245px] flex-shrink-0'
     }`;
 
   return (
@@ -119,7 +119,7 @@ export default function ProductCard({ product, onAddToCart, className = "" }) {
       <div className="pt-2 border-t border-transparent mt-auto relative z-10 bg-white flex items-center justify-between gap-2">
         <button
           onClick={handleAdd}
-          className={`border border-black font-extrabold text-[11px] py-1.5 px-3.5 rounded-full transition-all duration-200 uppercase tracking-wider text-center whitespace-nowrap ${added
+          className={`border border-black font-extrabold text-[10px] sm:text-[11px] py-2 px-4 rounded-full transition-all duration-300 uppercase tracking-[0.12em] text-center whitespace-nowrap active:scale-95 ${added
               ? 'bg-black text-white'
               : 'bg-white text-black hover:bg-black hover:text-white'
             }`}

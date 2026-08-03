@@ -1,29 +1,35 @@
 import React from 'react';
 import { Play } from 'lucide-react';
 
+import imgA from '../assets/10.jpg';
+import imgB from '../assets/11.jpg';
+import imgC from '../assets/12.jpg';
+import imgD from '../assets/13.jpg';
+import imgE from '../assets/14.jpg';
+
 const ugcPosts = [
   {
-    image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=600",
+    image: imgA,
     caption: "I've been loving the e.l.f. Never Thirsty Moisturizing Shampoo & Conditioner! The shampoo creates a rich, gentle lather...",
     hasPlay: false
   },
   {
-    image: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&q=80&w=600",
+    image: imgB,
     caption: "Found them! 🤩 Mi cabello es ondulado y el frizz siempre ha sido mi mayor batalla...",
     hasPlay: false
   },
   {
-    image: "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=600",
+    image: imgC,
     caption: "Locking the glow in with this glitzy SPF 50 stick!",
     hasPlay: true
   },
   {
-    image: "https://images.unsplash.com/photo-1583001809873-a1284d5b318f?auto=format&fit=crop&q=80&w=600",
+    image: imgD,
     caption: "We're serving stain. 💋 NEW Main Stain Lip Marker is now available on elfcosmetics.com!",
     hasPlay: true
   },
   {
-    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=600",
+    image: imgE,
     caption: "It's giving grape juice 🍇✨ cheek + lip combo with dark cocoa glow reviver...",
     hasPlay: true
   }
@@ -42,11 +48,11 @@ export default function UGCWall() {
         #elfingamazing
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 overflow-x-auto pb-4 no-scrollbar">
+      <div className="flex overflow-x-auto pb-4 no-scrollbar gap-4 md:grid md:grid-cols-5 md:overflow-x-visible md:pb-0">
         {ugcPosts.map((post, idx) => (
           <div 
             key={idx} 
-            className="relative aspect-[9/16] rounded-2xl overflow-hidden group shadow-md border border-neutral-200 cursor-pointer min-w-[200px]"
+            className="relative aspect-[9/16] rounded-2xl overflow-hidden group shadow-md border border-neutral-200 cursor-pointer min-w-[220px] sm:min-w-[240px] md:min-w-0 w-full flex-shrink-0"
           >
             <img 
               src={post.image} 

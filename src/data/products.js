@@ -1,3 +1,13 @@
+import p1 from '../assets/p1.png';
+import p2 from '../assets/p2.png';
+import p3 from '../assets/p3.png';
+import p4 from '../assets/p4.png';
+import p5 from '../assets/p5.png';
+import p6 from '../assets/p6.png';
+import p7 from '../assets/p7.png';
+import p8 from '../assets/p8.png';
+import p9 from '../assets/p9.png';
+
 export const products = [
   {
     id: 1,
@@ -11,7 +21,7 @@ export const products = [
     originalPrice: 15,
     buttonText: "ADD TO BAG",
     category: "skincare",
-    image: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&q=80&w=800"
+    image: p1
   },
   {
     id: 2,
@@ -24,7 +34,7 @@ export const products = [
     price: 10,
     buttonText: "SELECT SIZE",
     category: "makeup",
-    image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&q=80&w=800"
+    image: p2
   },
   {
     id: 3,
@@ -37,7 +47,7 @@ export const products = [
     price: 10,
     buttonText: "ADD TO BAG",
     category: "skincare",
-    image: "https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=80&w=800"
+    image: p3
   },
   {
     id: 4,
@@ -51,7 +61,7 @@ export const products = [
     buttonText: "SELECT SHADE",
     shades: ["#fce7f3", "#fed7aa", "#ddd6fe", "#d1fae5"],
     category: "makeup",
-    image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=800"
+    image: p4
   },
   {
     id: 5,
@@ -64,7 +74,7 @@ export const products = [
     price: 9,
     buttonText: "ADD TO BAG",
     category: "hair",
-    image: "https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?auto=format&fit=crop&q=80&w=800"
+    image: p5
   },
   {
     id: 6,
@@ -80,7 +90,7 @@ export const products = [
     shades: ["#fde047", "#f97316", "#ea580c", "#b45309", "#78350f"],
     extraShades: "+9",
     category: "makeup",
-    image: "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&q=80&w=800"
+    image: p6
   },
   {
     id: 7,
@@ -95,7 +105,7 @@ export const products = [
     shades: ["#fef08a", "#fde047", "#ca8a04", "#854d0e"],
     extraShades: "+30",
     category: "makeup",
-    image: "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=800"
+    image: p7
   },
   {
     id: 8,
@@ -110,7 +120,7 @@ export const products = [
     shades: ["#d97706", "#b45309", "#78350f"],
     extraShades: "+2",
     category: "makeup",
-    image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=80&w=800"
+    image: p8
   },
   {
     id: 9,
@@ -125,7 +135,7 @@ export const products = [
     buttonText: "SELECT SHADE",
     shades: ["#fef3c7", "#fed7aa"],
     category: "makeup",
-    image: "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&q=80&w=800"
+    image: p9
   },
   {
     id: 10,

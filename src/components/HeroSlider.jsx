@@ -1,136 +1,155 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+
+import p4 from '../assets/p4.png';
+import p3 from '../assets/p3.png';
+import p2 from '../assets/p2.png';
 
 const slides = [
   {
     id: 1,
-    tag: "new!",
-    tagClass: "text-white font-black text-sm uppercase tracking-wider",
-    title: "lock the e.l.f. in.",
-    titleColor: "text-white",
-    subtitle: "The new definition of setting goals: this luminous, makeup-locking duo.",
-    subtitleColor: "text-white/90",
-    buttonText: "DOUBLE SET IT",
-    buttonBg: "bg-white text-black hover:bg-neutral-100",
-    bgColor: "bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-300",
-    imageCaption: "Halimotu wears Set It in Bright Deep/Rich",
-    image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=1200"
+    tag: "NEW IN SKINCARE",
+    title: "lock the glow.\nown the look.",
+    subtitle: "Say goodbye to melting makeup. Meet the ultimate luminous, makeup-locking duo that holds your look all day long.",
+    buttonText: "Explore The Duo",
+    image: p4,
+    tagColor: "text-pink-400"
   },
   {
     id: 2,
-    tag: "new! Gloss Mode Treatment Oil",
-    tagClass: "bg-white/90 text-amber-700 font-extrabold text-xs px-3.5 py-1 rounded-full shadow-xs",
+    tag: "HAIRCARE REVOLUTION",
     title: "drip. drop.\nshine won't stop.",
-    titleColor: "text-amber-500",
-    subtitle: "Glossy styling oil strengthens hair* and helps protect it from heat. Only $10.",
-    subtitleColor: "text-amber-800",
-    buttonText: "SHOP NOW",
-    buttonBg: "bg-white text-black hover:bg-neutral-100",
-    bgColor: "bg-[#fff9b3]",
-    disclaimer: "*Versus control.",
-    image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=1200"
+    subtitle: "Strengthen, protect, and gloss. Infused with weightless nutrients for a mirror-like shine that shields from heat.",
+    buttonText: "Shop Gloss Mode",
+    image: p3,
+    tagColor: "text-amber-400",
+    disclaimer: "*Compared to untreated hair."
   },
   {
     id: 3,
-    tag: "NEW DROP",
-    tagClass: "bg-black text-white font-extrabold text-xs px-3.5 py-1 rounded-full",
-    title: "power grip\ncollection",
-    titleColor: "text-black",
-    subtitle: "The iconic, makeup-locking lineup has something for every sticky stan.",
-    subtitleColor: "text-black/90",
-    buttonText: "SHOP NOW",
-    buttonBg: "bg-black text-white hover:bg-neutral-800",
-    bgColor: "bg-[#00cbf6]",
-    image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&q=80&w=1200"
+    tag: "HOLY GRAIL",
+    title: "power grip\nyour routine.",
+    subtitle: "The award-winning, makeup-locking primer collection designed for ultimate hydration and 16-hour hold.",
+    buttonText: "Shop the Collection",
+    image: p2,
+    tagColor: "text-cyan-400"
   }
 ];
 
 export default function HeroSlider() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 6000);
-    return () => clearInterval(timer);
+  const nextSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
   }, []);
 
-  const active = slides[currentSlide];
+  const prevSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(nextSlide, 6000);
+    return () => clearInterval(timer);
+  }, [nextSlide]);
 
   return (
-    <div className={`w-full overflow-hidden transition-colors duration-700 ${active.bgColor}`}>
-      {/* Taller container to prevent images from being squeezed/cut off */}
-      <div className="w-full max-w-[1440px] mx-auto flex flex-col md:flex-row items-stretch min-h-[500px] md:min-h-[560px]">
-        
-        {/* Left Side Content Container (Vertically centered gracefully) */}
-        <div className="w-full md:w-1/2 flex flex-col justify-center px-8 sm:px-14 md:px-20 py-12 md:py-16 relative z-10 space-y-4">
-          
-          {/* Tag / Badge */}
-          {active.tag && (
-            <div>
-              <span className={active.tagClass}>
-                {active.tag}
-              </span>
-            </div>
-          )}
-
-          {/* Headline */}
-          <h1 className={`text-4xl sm:text-5xl lg:text-[4rem] font-black lowercase tracking-tighter leading-[1.05] whitespace-pre-line ${active.titleColor}`}>
-            {active.title}
-          </h1>
-
-          {/* Subtitle */}
-          <p className={`text-sm md:text-base font-semibold max-w-md leading-relaxed ${active.subtitleColor}`}>
-            {active.subtitle}
-          </p>
-
-          {/* CTA Button */}
-          <div className="pt-2">
-            <button className={`font-black text-xs md:text-sm px-8 py-3.5 rounded-full uppercase tracking-wider shadow-sm transition-transform hover:scale-105 ${active.buttonBg}`}>
-              {active.buttonText}
-            </button>
-          </div>
-
-          {/* Indicator Dots & Disclaimer */}
-          <div className="pt-6 flex items-center space-x-4">
-            <div className="flex items-center space-x-2.5">
-              {slides.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentSlide(idx)}
-                  className={`transition-all duration-300 ${
-                    currentSlide === idx 
-                      ? 'w-8 h-2 rounded-full bg-black' 
-                      : 'w-2 h-2 rounded-full bg-black/40 hover:bg-black'
+    <div className="w-full relative h-[70vh] sm:h-[80vh] min-h-[550px] max-h-[750px] overflow-hidden bg-neutral-900 group">
+      {/* Slides Container */}
+      <div className="relative w-full h-full">
+        {slides.map((slide, idx) => {
+          const isActive = currentSlide === idx;
+          return (
+            <div
+              key={slide.id}
+              className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${isActive ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'
+                }`}
+            >
+              {/* Immersive Ken Burns Background Image */}
+              <div
+                className={`absolute inset-0 bg-cover bg-center transition-transform duration-[6000ms] ease-out ${isActive ? 'scale-105' : 'scale-100'
                   }`}
-                  aria-label={`Go to slide ${idx + 1}`}
-                />
-              ))}
+                style={{ backgroundImage: `url(${slide.image})` }}
+              />
+
+              {/* Ambient Luxury Dark Overlay (Ensuring clear contrast) */}
+              <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/45 to-transparent" />
+
+              {/* Content Panel (Floating gracefully) */}
+              <div className="relative z-20 w-full h-full max-w-[1440px] mx-auto px-6 sm:px-12 md:px-20 flex flex-col justify-center text-left text-white space-y-6">
+
+                {/* Badge Tag */}
+                <div className={`transform transition-all duration-1000 delay-300 ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+                  <span className={`text-xs font-black tracking-[0.25em] uppercase ${slide.tagColor}`}>
+                    {slide.tag}
+                  </span>
+                </div>
+
+                {/* Main Headline */}
+                <h1 className={`text-5xl sm:text-6xl lg:text-[5rem] font-black lowercase tracking-tighter leading-none transform transition-all duration-1000 delay-400 ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+                  {slide.title}
+                </h1>
+
+                {/* Subtitle description */}
+                <p className={`text-sm sm:text-base text-neutral-300 font-medium max-w-xl leading-relaxed transform transition-all duration-1000 delay-500 ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+                  {slide.subtitle}
+                </p>
+
+                {/* Action CTA Button */}
+                <div className={`pt-2 transform transition-all duration-1000 delay-600 ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+                  <button className="bg-white text-black font-extrabold text-xs sm:text-sm uppercase tracking-[0.15em] px-10 py-4 rounded-full shadow-2xl hover:bg-neutral-100 hover:scale-105 active:scale-95 transition-all duration-300">
+                    {slide.buttonText}
+                  </button>
+                </div>
+
+                {/* Meta details & Indicators */}
+                <div className={`pt-6 flex items-center space-x-6 transform transition-all duration-1000 delay-700 ${isActive ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+                  <span className="text-xs font-black tracking-widest text-white/50">
+                    0{idx + 1} / 0{slides.length}
+                  </span>
+
+                  {/* Slider Progress Dashes */}
+                  <div className="flex items-center space-x-2">
+                    {slides.map((_, sIdx) => (
+                      <button
+                        key={sIdx}
+                        onClick={() => setCurrentSlide(sIdx)}
+                        className={`h-[3px] rounded-full transition-all duration-500 ${currentSlide === sIdx
+                            ? 'w-10 bg-white'
+                            : 'w-3 bg-white/30 hover:bg-white/50'
+                          }`}
+                        aria-label={`Go to slide ${sIdx + 1}`}
+                      />
+                    ))}
+                  </div>
+
+                  {slide.disclaimer && (
+                    <span className="text-[10px] text-white/40 tracking-wider font-semibold uppercase">
+                      {slide.disclaimer}
+                    </span>
+                  )}
+                </div>
+
+              </div>
             </div>
-            {active.disclaimer && (
-              <span className="text-[11px] text-amber-900 font-bold">
-                {active.disclaimer}
-              </span>
-            )}
-          </div>
-
-        </div>
-
-        {/* Right Side Image (Full height, proper cover without max-h constraints) */}
-        <div className="w-full md:w-1/2 relative min-h-[350px] md:min-h-full">
-          <img 
-            src={active.image} 
-            alt={active.title} 
-            fetchpriority="high"
-            className="absolute inset-0 w-full h-full object-cover object-center"
-          />
-          {active.imageCaption && (
-            <div className="absolute bottom-6 right-6 bg-black/60 backdrop-blur-md text-white text-xs font-bold px-4 py-2 rounded-lg shadow-lg">
-              {active.imageCaption}
-            </div>
-          )}
-        </div>
-
+          );
+        })}
       </div>
+
+      {/* Navigation Arrows (Visible on Slider Hover) */}
+      <button
+        onClick={prevSlide}
+        className="absolute left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full border border-white/20 bg-white/5 text-white backdrop-blur-md flex items-center justify-center hover:bg-white hover:text-black hover:border-white shadow-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 active:scale-90"
+        aria-label="Previous Slide"
+      >
+        <ChevronLeft className="w-5 h-5" />
+      </button>
+      <button
+        onClick={nextSlide}
+        className="absolute right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full border border-white/20 bg-white/5 text-white backdrop-blur-md flex items-center justify-center hover:bg-white hover:text-black hover:border-white shadow-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 active:scale-90"
+        aria-label="Next Slide"
+      >
+        <ChevronRight className="w-5 h-5" />
+      </button>
     </div>
   );
 }
