@@ -24,12 +24,12 @@ export default function FloatingWidgets() {
                 <div className="w-8 h-8 rounded-full overflow-hidden border border-white">
                   <img 
                     src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200" 
-                    alt="e.l.f. Beauty Advisor" 
+                    alt="Amaré Beauty Advisor" 
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <div>
-                  <h4 className="font-extrabold text-sm leading-none">e.l.f. Beauty Bot</h4>
+                  <h4 className="font-extrabold text-sm leading-none">Amaré Beauty Bot</h4>
                   <span className="text-[10px] text-green-400 font-bold">Online</span>
                 </div>
               </div>
@@ -45,7 +45,7 @@ export default function FloatingWidgets() {
             <div className="p-2 bg-white border-t border-neutral-200">
               <input 
                 type="text" 
-                placeholder="Ask e.l.f. advisor..." 
+                placeholder="Ask Amaré advisor..." 
                 className="w-full text-xs bg-neutral-100 p-2.5 rounded-full border border-neutral-300 focus:outline-none focus:border-black"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {

@@ -8,6 +8,17 @@ import p7 from '../assets/p7.png';
 import p8 from '../assets/p8.png';
 import p9 from '../assets/p9.png';
 
+// Category Images
+import faceImg from '../assets/Face1.PNG';
+import lipsImg from '../assets/lips1.PNG';
+import brushImg from '../assets/bursh1.PNG';
+import nailImg from '../assets/nail1.PNG';
+import makeupImg from '../assets/cosmatic1.PNG';
+import hairImg from '../assets/hair1.PNG';
+import skinImg from '../assets/skin1.PNG';
+import eyesImg from '../assets/eyes0.PNG';
+import setImg from '../assets/set1.PNG';
+
 export const products = [
   {
     id: 1,
@@ -260,14 +271,15 @@ export const products = [
 ];
 
 export const categories = [
-  { title: "hair", image: "https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?auto=format&fit=crop&q=80&w=800" },
-  { title: "cosmetics", image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=800" },
-  { title: "skin", image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&q=80&w=800" },
-  { title: "eyes", image: "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=800" },
-  { title: "face", image: "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&q=80&w=800" },
-  { title: "lips", image: "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&q=80&w=800" },
-  { title: "brushes", image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=80&w=800" },
-  { title: "sets & kits", image: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&q=80&w=800" }
+  { title: "Face", slug: "face", image: faceImg },
+  { title: "Lips", slug: "lips", image: lipsImg },
+  { title: "Brushes", slug: "brushes", image: brushImg },
+  { title: "Nails", slug: "nails", image: nailImg },
+  { title: "Makeup", slug: "makeup", image: makeupImg },
+  { title: "Hair", slug: "hair", image: hairImg },
+  { title: "Skincare", slug: "skincare", image: skinImg },
+  { title: "Eyes", slug: "eyes", image: eyesImg },
+  { title: "Sets & Kits", slug: "sets", image: setImg }
 ];
 
 export const featuredCallouts = [

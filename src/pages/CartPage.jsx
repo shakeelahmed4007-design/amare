@@ -65,7 +65,7 @@ export default function CartPage() {
             <div className="space-y-8">
               {cartItems.map((item) => (
                 <div key={item.id} className="flex gap-6 pb-8 border-b border-gray-100">
-                  <img src={item.image} alt={item.name} className="w-32 h-40 object-cover bg-white" />
+                  <img src={item.image} alt={item.name} className="w-32 h-40 object-contain bg-white p-2" />
                   <div className="flex-1 flex flex-col justify-between">
                     <div className="flex justify-between items-start">
                       <div>

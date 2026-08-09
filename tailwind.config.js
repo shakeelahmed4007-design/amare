@@ -24,13 +24,13 @@ export default {
           accent: '#3b82f6',
         },
         geeks: {
-          orange: '#F97316', 
-          red: '#DC2626',    
-          yellow: '#FEF08A', 
-          salmon: '#F87171', 
-          dark: '#111827',   
-          gray: '#F3F4F6',   
-          darkgray: '#4B5563', 
+          orange: '#F97316',
+          red: '#DC2626',
+          yellow: '#FEF08A',
+          salmon: '#F87171',
+          dark: '#111827',
+          gray: '#F3F4F6',
+          darkgray: '#4B5563',
         }
       },
       fontFamily: {

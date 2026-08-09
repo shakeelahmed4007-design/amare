@@ -3,6 +3,11 @@ import { featuredCallouts } from '../data/products';
 import { Star, Check, ShoppingBag, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+import step1Img from '../assets/Shampoo.PNG';
+import step2Img from '../assets/mid.PNG';
+import step3Img from '../assets/result.PNG';
+
+
 const MiniProductCard = ({ product, onAddToCart }) => {
   const [selectedShade, setSelectedShade] = useState(product.shades ? product.shades[0] : null);
   const [added, setAdded] = useState(false);
@@ -22,7 +27,7 @@ const MiniProductCard = ({ product, onAddToCart }) => {
       {/* Mini Image */}
       <Link to={`/product/${product.id}`} className="shrink-0 w-[64px] h-[64px] bg-white rounded-lg p-1 border border-neutral-100 flex items-center justify-center overflow-hidden">
         <img 
-          src={product.image} 
+          src={product.image || (product.images && product.images[0]) || ''} 
           alt={product.title} 
           loading="lazy"
           className="w-full h-full object-cover rounded-md group-hover:scale-105 transition-transform" 
@@ -85,9 +90,9 @@ const MiniProductCard = ({ product, onAddToCart }) => {
 
 export default function FeaturedCallout({ onAddToCart }) {
   const stepImages = [
-    "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=800",
-    "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&q=80&w=800",
-    "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=80&w=800"
+    step1Img,
+    step2Img,
+    step3Img
   ];
 
   return (
@@ -110,12 +115,12 @@ export default function FeaturedCallout({ onAddToCart }) {
           <div key={idx} className="bg-white rounded-2xl border border-neutral-200 p-4 sm:p-5 flex flex-col justify-between hover:shadow-xl hover:border-neutral-300 transition-all duration-300 group">
             
             {/* Step Image */}
-            <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden mb-4 bg-neutral-100">
+            <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden mb-4 bg-neutral-100 p-4 group/img">
               <img 
-                src={stepImages[idx] || item.product.image} 
+                src={stepImages[idx] || item.product.image || (item.product.images && item.product.images[0]) || ''} 
                 alt={item.heading} 
                 loading="lazy"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                className="w-full h-full object-contain group-hover/img:scale-105 transition-transform duration-500"
               />
               <div className="absolute top-3 left-3 bg-black text-white text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow-md">
                 Step {idx + 1}

@@ -125,7 +125,7 @@ export default function ProductBentoGrid({ title = "Award-Winning Supplements", 
               <div className="w-full h-[280px] mb-6 flex justify-center items-center relative">
                 <div className="absolute inset-0 bg-rose-50 rounded-2xl transform scale-95 opacity-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-500 -z-10"></div>
                 <img 
-                  src={product.image} 
+                  src={product.image || (product.images && product.images[0]) || ''} 
                   alt={product.name} 
                   className="max-h-full max-w-[85%] object-contain drop-shadow-sm transition-transform duration-700 group-hover:scale-110" 
                 />

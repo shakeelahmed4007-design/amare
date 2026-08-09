@@ -1,174 +1,270 @@
 import { useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
-import { TrendingUp, Users, ShoppingBag, DollarSign, Download } from 'lucide-react';
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  LineChart, Line, Area, AreaChart
+} from 'recharts';
+import { TrendingUp, TrendingDown, Users, ShoppingBag, DollarSign, Download, ArrowUpRight } from 'lucide-react';
 
 const salesData = [
   { name: 'Mon', sales: 4000, orders: 240 },
   { name: 'Tue', sales: 3000, orders: 139 },
-  { name: 'Wed', sales: 2000, orders: 980 },
-  { name: 'Thu', sales: 2780, orders: 390 },
-  { name: 'Fri', sales: 1890, orders: 480 },
-  { name: 'Sat', sales: 2390, orders: 380 },
-  { name: 'Sun', sales: 3490, orders: 430 },
+  { name: 'Wed', sales: 5200, orders: 380 },
+  { name: 'Thu', sales: 2780, orders: 290 },
+  { name: 'Fri', sales: 4890, orders: 480 },
+  { name: 'Sat', sales: 6390, orders: 520 },
+  { name: 'Sun', sales: 5490, orders: 430 },
 ];
 
 const topProducts = [
-  { id: 1, name: 'Power Grip Primer', sales: 1245, revenue: 12450 },
-  { id: 2, name: 'Halo Glow Liquid Filter', sales: 982, revenue: 13748 },
-  { id: 3, name: 'O-Face Satin Lipstick', sales: 843, revenue: 7587 },
-  { id: 4, name: 'Bite-Size Eyeshadow', sales: 654, revenue: 1962 },
+  { id: 1, name: 'Power Grip Primer', sales: 1245, revenue: 12450, share: 32 },
+  { id: 2, name: 'Halo Glow Liquid Filter', sales: 982, revenue: 13748, share: 26 },
+  { id: 3, name: "O-Face Satin Lipstick", sales: 843, revenue: 7587, share: 22 },
+  { id: 4, name: 'Bite-Size Eyeshadow', sales: 654, revenue: 1962, share: 20 },
 ];
+
+const STAT_CARDS = [
+  {
+    label: 'Total Revenue',
+    value: '$45,231',
+    change: '+20.1%',
+    up: true,
+    icon: DollarSign,
+    color: 'text-emerald-500',
+    bg: 'bg-emerald-50 dark:bg-emerald-950/30',
+  },
+  {
+    label: 'Total Orders',
+    value: '3,219',
+    change: '+12.5%',
+    up: true,
+    icon: ShoppingBag,
+    color: 'text-blue-500',
+    bg: 'bg-blue-50 dark:bg-blue-950/30',
+  },
+  {
+    label: 'New Customers',
+    value: '844',
+    change: '+18.2%',
+    up: true,
+    icon: Users,
+    color: 'text-violet-500',
+    bg: 'bg-violet-50 dark:bg-violet-950/30',
+  },
+  {
+    label: 'Conversion Rate',
+    value: '3.2%',
+    change: '-1.1%',
+    up: false,
+    icon: TrendingUp,
+    color: 'text-rose-500',
+    bg: 'bg-rose-50 dark:bg-rose-950/30',
+  },
+];
+
+const CHART_TOOLTIP_STYLE = {
+  contentStyle: {
+    backgroundColor: '#1e293b',
+    border: 'none',
+    borderRadius: '12px',
+    color: '#fff',
+    fontSize: '12px',
+    padding: '10px 14px',
+  },
+  itemStyle: { color: '#94a3b8' },
+  labelStyle: { color: '#fff', fontWeight: 800, marginBottom: 4 },
+};
 
 export function Analytics() {
   const [timeRange, setTimeRange] = useState('7d');
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-8">
+
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-admin-text dark:text-admin-darkText">Analytics & Reports</h1>
-          <p className="text-sm text-admin-muted dark:text-admin-darkMuted mt-1">Track your store's performance and sales trends.</p>
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-neutral-900 dark:text-white">
+            Analytics & Reports
+          </h1>
+          <p className="text-xs sm:text-sm text-neutral-500 dark:text-slate-400 mt-1">
+            Track your store's performance, sales trends, and customer insights.
+          </p>
         </div>
-        <div className="flex items-center gap-3">
-          <select 
+        <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap self-start sm:self-auto">
+          <select
             value={timeRange}
-            onChange={(e) => setTimeRange(e.target.value)}
-            className="bg-white dark:bg-admin-darkCard border border-admin-border dark:border-admin-darkBorder text-admin-text dark:text-admin-darkText rounded-md py-2 pl-3 pr-8 text-sm focus:ring-2 focus:ring-admin-accent focus:border-transparent outline-none"
+            onChange={e => setTimeRange(e.target.value)}
+            className="px-3.5 py-2.5 bg-white dark:bg-slate-900 border border-neutral-200 dark:border-slate-700 rounded-xl text-xs font-bold outline-none text-neutral-800 dark:text-slate-200 shadow-sm"
           >
             <option value="7d">Last 7 days</option>
             <option value="30d">Last 30 days</option>
             <option value="90d">Last 90 days</option>
             <option value="12m">Last 12 months</option>
           </select>
-          <button className="inline-flex items-center justify-center rounded-md bg-admin-text dark:bg-admin-darkText px-4 py-2 text-sm font-semibold text-white dark:text-black shadow-sm hover:bg-admin-text/90 transition-colors">
-            <Download className="-ml-1 mr-2 h-4 w-4" aria-hidden="true" />
+          <button className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-black text-xs font-bold shadow-md hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors">
+            <Download className="w-4 h-4" />
             Export
           </button>
         </div>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="bg-white dark:bg-admin-darkCard p-6 rounded-xl shadow-soft dark:shadow-dark-soft border border-admin-border/50 dark:border-admin-darkBorder/50">
-          <div className="flex items-center justify-between pb-2">
-            <h3 className="text-sm font-medium text-admin-muted dark:text-admin-darkMuted">Total Revenue</h3>
-            <DollarSign className="h-4 w-4 text-admin-muted dark:text-admin-darkMuted" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        {STAT_CARDS.map(card => (
+          <div
+            key={card.label}
+            className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-neutral-200/80 dark:border-slate-800 shadow-sm hover:shadow-md transition-all"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-slate-500 truncate">
+                  {card.label}
+                </p>
+                <p className="text-2xl sm:text-3xl font-black text-neutral-900 dark:text-white mt-1">
+                  {card.value}
+                </p>
+              </div>
+              <div className={`p-2.5 rounded-xl ${card.bg} shrink-0`}>
+                <card.icon className={`w-4 h-4 sm:w-5 sm:h-5 ${card.color}`} />
+              </div>
+            </div>
+            <div className={`mt-3 flex items-center gap-1 text-xs font-bold ${card.up ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`}>
+              {card.up
+                ? <TrendingUp className="w-3.5 h-3.5" />
+                : <TrendingDown className="w-3.5 h-3.5" />
+              }
+              {card.change} from last period
+            </div>
           </div>
-          <div className="text-2xl font-bold text-admin-text dark:text-admin-darkText">$45,231.89</div>
-          <p className="text-xs text-green-500 flex items-center mt-1">
-            <TrendingUp className="h-3 w-3 mr-1" />
-            +20.1% from last period
-          </p>
-        </div>
-        
-        <div className="bg-white dark:bg-admin-darkCard p-6 rounded-xl shadow-soft dark:shadow-dark-soft border border-admin-border/50 dark:border-admin-darkBorder/50">
-          <div className="flex items-center justify-between pb-2">
-            <h3 className="text-sm font-medium text-admin-muted dark:text-admin-darkMuted">Orders</h3>
-            <ShoppingBag className="h-4 w-4 text-admin-muted dark:text-admin-darkMuted" />
-          </div>
-          <div className="text-2xl font-bold text-admin-text dark:text-admin-darkText">+3,219</div>
-          <p className="text-xs text-green-500 flex items-center mt-1">
-            <TrendingUp className="h-3 w-3 mr-1" />
-            +12.5% from last period
-          </p>
-        </div>
-
-        <div className="bg-white dark:bg-admin-darkCard p-6 rounded-xl shadow-soft dark:shadow-dark-soft border border-admin-border/50 dark:border-admin-darkBorder/50">
-          <div className="flex items-center justify-between pb-2">
-            <h3 className="text-sm font-medium text-admin-muted dark:text-admin-darkMuted">New Customers</h3>
-            <Users className="h-4 w-4 text-admin-muted dark:text-admin-darkMuted" />
-          </div>
-          <div className="text-2xl font-bold text-admin-text dark:text-admin-darkText">+844</div>
-          <p className="text-xs text-green-500 flex items-center mt-1">
-            <TrendingUp className="h-3 w-3 mr-1" />
-            +18.2% from last period
-          </p>
-        </div>
-
-        <div className="bg-white dark:bg-admin-darkCard p-6 rounded-xl shadow-soft dark:shadow-dark-soft border border-admin-border/50 dark:border-admin-darkBorder/50">
-          <div className="flex items-center justify-between pb-2">
-            <h3 className="text-sm font-medium text-admin-muted dark:text-admin-darkMuted">Conversion Rate</h3>
-            <TrendingUp className="h-4 w-4 text-admin-muted dark:text-admin-darkMuted" />
-          </div>
-          <div className="text-2xl font-bold text-admin-text dark:text-admin-darkText">3.2%</div>
-          <p className="text-xs text-red-500 flex items-center mt-1">
-            <TrendingUp className="h-3 w-3 mr-1 rotate-180 transform" />
-            -1.1% from last period
-          </p>
-        </div>
+        ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
         {/* Revenue Chart */}
-        <div className="bg-white dark:bg-admin-darkCard p-6 rounded-xl shadow-soft dark:shadow-dark-soft border border-admin-border/50 dark:border-admin-darkBorder/50">
-          <h3 className="text-lg font-bold text-admin-text dark:text-admin-darkText mb-6">Revenue Over Time</h3>
-          <div className="h-[300px] w-full">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-neutral-200/80 dark:border-slate-800 shadow-sm p-5">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h3 className="text-base font-black text-neutral-900 dark:text-white">Revenue Over Time</h3>
+              <p className="text-xs text-neutral-400 mt-0.5">Daily revenue trend</p>
+            </div>
+            <div className="flex items-center gap-1 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-2.5 py-1 rounded-full">
+              <ArrowUpRight className="w-3.5 h-3.5" />
+              +24%
+            </div>
+          </div>
+          <div className="h-52 sm:h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={salesData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.2} />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b'}} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b'}} tickFormatter={(value) => `$${value}`} />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }}
-                  itemStyle={{ color: '#fff' }}
-                />
-                <Line type="monotone" dataKey="sales" stroke="#000000" strokeWidth={3} dot={{r: 4, strokeWidth: 2}} activeDot={{r: 6}} />
-              </LineChart>
+              <AreaChart data={salesData}>
+                <defs>
+                  <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.15} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 11 }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 11 }} tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} />
+                <Tooltip {...CHART_TOOLTIP_STYLE} formatter={v => [`$${v.toLocaleString()}`, 'Revenue']} />
+                <Area type="monotone" dataKey="sales" stroke="#06b6d4" strokeWidth={2.5} fill="url(#salesGrad)" dot={{ r: 3, fill: '#06b6d4', strokeWidth: 0 }} activeDot={{ r: 5 }} />
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* Orders Chart */}
-        <div className="bg-white dark:bg-admin-darkCard p-6 rounded-xl shadow-soft dark:shadow-dark-soft border border-admin-border/50 dark:border-admin-darkBorder/50">
-          <h3 className="text-lg font-bold text-admin-text dark:text-admin-darkText mb-6">Orders Volume</h3>
-          <div className="h-[300px] w-full">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-neutral-200/80 dark:border-slate-800 shadow-sm p-5">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h3 className="text-base font-black text-neutral-900 dark:text-white">Orders Volume</h3>
+              <p className="text-xs text-neutral-400 mt-0.5">Daily order count</p>
+            </div>
+            <div className="flex items-center gap-1 text-xs font-bold text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/30 px-2.5 py-1 rounded-full">
+              <ArrowUpRight className="w-3.5 h-3.5" />
+              +12.5%
+            </div>
+          </div>
+          <div className="h-52 sm:h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={salesData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.2} />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b'}} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b'}} />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }}
-                  itemStyle={{ color: '#fff' }}
-                  cursor={{fill: '#334155', opacity: 0.1}}
-                />
-                <Bar dataKey="orders" fill="#000000" radius={[4, 4, 0, 0]} />
+              <BarChart data={salesData} barSize={24}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.15} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 11 }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 11 }} />
+                <Tooltip {...CHART_TOOLTIP_STYLE} formatter={v => [v, 'Orders']} />
+                <Bar dataKey="orders" fill="#8b5cf6" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
       </div>
 
-      {/* Top Products */}
-      <div className="bg-white dark:bg-admin-darkCard rounded-xl shadow-soft dark:shadow-dark-soft border border-admin-border/50 dark:border-admin-darkBorder/50 overflow-hidden">
-        <div className="p-6 border-b border-admin-border dark:border-admin-darkBorder">
-          <h3 className="text-lg font-bold text-admin-text dark:text-admin-darkText">Top Selling Products</h3>
+      {/* Top Products Table */}
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-neutral-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
+        <div className="p-5 border-b border-neutral-100 dark:border-slate-800">
+          <h3 className="text-base font-black text-neutral-900 dark:text-white">Top Selling Products</h3>
+          <p className="text-xs text-neutral-400 mt-0.5">Best performers this period</p>
         </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-admin-border dark:divide-admin-darkBorder">
-            <thead className="bg-admin-bg/50 dark:bg-slate-800/50">
+
+        {/* Desktop Table */}
+        <div className="hidden sm:block overflow-x-auto">
+          <table className="min-w-full divide-y divide-neutral-100 dark:divide-slate-800">
+            <thead className="bg-neutral-50/80 dark:bg-slate-800/50">
               <tr>
-                <th scope="col" className="py-3.5 pl-6 pr-3 text-left text-sm font-semibold text-admin-text dark:text-admin-darkText">Product</th>
-                <th scope="col" className="px-3 py-3.5 text-right text-sm font-semibold text-admin-text dark:text-admin-darkText">Units Sold</th>
-                <th scope="col" className="px-3 py-3.5 text-right text-sm font-semibold text-admin-text dark:text-admin-darkText pr-6">Revenue</th>
+                {['#', 'Product', 'Units Sold', 'Revenue', 'Share'].map(h => (
+                  <th key={h} scope="col" className="py-3.5 px-4 text-left text-[11px] font-black uppercase text-neutral-400 tracking-wider first:pl-5 last:pr-5">
+                    {h}
+                  </th>
+                ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-admin-border dark:divide-admin-darkBorder">
-              {topProducts.map((product) => (
-                <tr key={product.id} className="hover:bg-admin-bg/50 dark:hover:bg-slate-800/20 transition-colors">
-                  <td className="whitespace-nowrap py-4 pl-6 pr-3 text-sm font-medium text-admin-text dark:text-admin-darkText">
-                    {product.name}
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-right text-admin-muted dark:text-admin-darkMuted">
-                    {product.sales.toLocaleString()}
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-right font-medium text-admin-text dark:text-admin-darkText pr-6">
-                    ${product.revenue.toLocaleString()}
+            <tbody className="divide-y divide-neutral-100 dark:divide-slate-800/80">
+              {topProducts.map((product, idx) => (
+                <tr key={product.id} className="hover:bg-neutral-50/80 dark:hover:bg-slate-800/30 transition-colors">
+                  <td className="py-4 pl-5 pr-4 text-xs font-black text-neutral-400">#{idx + 1}</td>
+                  <td className="px-4 py-4 text-xs font-extrabold text-neutral-900 dark:text-white">{product.name}</td>
+                  <td className="px-4 py-4 text-xs font-bold text-neutral-600 dark:text-slate-400">{product.sales.toLocaleString()}</td>
+                  <td className="px-4 py-4 text-xs font-black text-neutral-900 dark:text-white">${product.revenue.toLocaleString()}</td>
+                  <td className="px-4 py-4 pr-5">
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-1.5 bg-neutral-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full"
+                          style={{ width: `${product.share}%` }}
+                        />
+                      </div>
+                      <span className="text-[10px] font-bold text-neutral-400 w-8 text-right">{product.share}%</span>
+                    </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile List */}
+        <div className="block sm:hidden divide-y divide-neutral-100 dark:divide-slate-800">
+          {topProducts.map((product, idx) => (
+            <div key={product.id} className="p-4 flex items-center gap-3">
+              <span className="text-lg font-black text-neutral-200 dark:text-slate-700 w-6 shrink-0">#{idx + 1}</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold text-neutral-900 dark:text-white truncate">{product.name}</p>
+                <div className="flex items-center gap-2 mt-1.5">
+                  <div className="flex-1 h-1 bg-neutral-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full"
+                      style={{ width: `${product.share}%` }}
+                    />
+                  </div>
+                  <span className="text-[10px] font-bold text-neutral-400">{product.share}%</span>
+                </div>
+              </div>
+              <div className="text-right shrink-0">
+                <p className="text-xs font-black text-neutral-900 dark:text-white">${product.revenue.toLocaleString()}</p>
+                <p className="text-[10px] text-neutral-400">{product.sales} units</p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

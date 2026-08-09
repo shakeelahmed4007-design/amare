@@ -3,7 +3,7 @@ import { Save, Shield, Store, Bell, CreditCard, HelpCircle } from 'lucide-react'
 
 export function Settings() {
   const [activeTab, setActiveTab] = useState('general');
-  const [storeName, setStoreName] = useState('e.l.f. Style Cosmetics');
+  const [storeName, setStoreName] = useState('Amaré Style Cosmetics');
   const [contactEmail, setContactEmail] = useState('info@cosmatic.com');
   const [currency, setCurrency] = useState('USD');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,11 +41,10 @@ export function Settings() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
-                    activeTab === tab.id
+                  className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${activeTab === tab.id
                       ? 'bg-admin-text dark:bg-admin-darkText text-white dark:text-black font-semibold'
                       : 'text-admin-muted dark:text-admin-darkMuted hover:bg-admin-bg dark:hover:bg-slate-800'
-                  }`}
+                    }`}
                 >
                   <Icon className="h-4 w-4 shrink-0" />
                   {tab.name}
@@ -60,7 +59,7 @@ export function Settings() {
           {activeTab === 'general' && (
             <form onSubmit={handleSave} className="space-y-6">
               <h3 className="text-lg font-bold text-admin-text dark:text-admin-darkText">General Store Information</h3>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-admin-text dark:text-admin-darkText mb-2">Store Name</label>

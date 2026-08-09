@@ -7,11 +7,17 @@ import FeaturedCallout from '../components/FeaturedCallout';
 import PerksBar from '../components/PerksBar';
 import BeautySquadRewards from '../components/BeautySquadRewards';
 import UGCWall from '../components/UGCWall';
-import { products } from '../data/products';
+import { useStore } from '../contexts/StoreContext';
 
 export default function Home({ onAddToCart }) {
-  const newArrivals = products.slice(0, 10);
-  const recommendations = products.slice(10, 18);
+  const { products } = useStore();
+
+  // Only show Active products on the storefront
+  const activeProducts = products.filter(p => !p.status || p.status === 'Active');
+
+  const newArrivals = activeProducts.slice(0, 10);
+  const recommendations = activeProducts.slice(2, 10);
+
 
   return (
     <main className="bg-white min-h-screen">
@@ -47,7 +53,7 @@ export default function Home({ onAddToCart }) {
       {/* Beauty Squad Purple Rewards Banner */}
       <BeautySquadRewards />
 
-      {/* e.l.f. on you Social Wall Feed */}
+      {/* Amaré on you Social Wall Feed */}
       <UGCWall />
 
       {/* You May Also Love Carousel */}

@@ -203,7 +203,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems = [], onUpdateQu
         </div>
 
         <p className="text-[10px] text-neutral-500 leading-snug text-left">
-          By continuing, you agree to the Beauty Squad Terms and Conditions as well as e.l.f.'s Terms of Use and Privacy Notice, including e.l.f.'s Notice of Financial Incentive.
+          By continuing, you agree to the Beauty Squad Terms and Conditions as well as Amaré's Terms of Use and Privacy Notice, including Amaré's Notice of Financial Incentive.
         </p>
       </div>
     </div>
@@ -247,7 +247,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems = [], onUpdateQu
               20% Off Discount
             </h5>
             <p className="text-[13px] text-indigo-900/80 leading-relaxed mb-4 text-left w-full">
-              Simply verify your student status with Student Beans and you'll receive 20% off e.l.f. Cosmetics! *Registered Student Beans users can redeem your 20% discount code. Code valid for 1 year.
+              Simply verify your student status with Student Beans and you'll receive 20% off Amaré Cosmetics! *Registered Student Beans users can redeem your 20% discount code. Code valid for 1 year.
             </p>
             <p className="text-[11px] text-indigo-900/60 leading-snug text-left w-full">
               Disclaimer: Receive 20% off your order when you redeem your coupon code at checkout. It cannot be combined with other coupon codes.

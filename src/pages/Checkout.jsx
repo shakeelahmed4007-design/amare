@@ -27,7 +27,7 @@ export default function Checkout({ cartItems = [] }) {
             {/* Logo / Header (mocked) */}
             <div className="mb-8">
               <Link to="/" className="text-3xl font-black italic tracking-tighter">
-                e.l.f.
+                Amaré
               </Link>
             </div>
 

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Search, User, ShoppingBag, Menu, X, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import MegaMenu from './MegaMenu';
+import logoImg from '../assets/LOGO.png';
 
 export default function Navbar({ onOpenCart, cartCount = 0 }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -25,45 +26,51 @@ export default function Navbar({ onOpenCart, cartCount = 0 }) {
     >
       <div className="w-full px-4 sm:px-8 py-2.5 flex items-center justify-between gap-4">
         
-        {/* Left Category Links */}
-        <div className="hidden xl:flex items-center space-x-6 text-[13px] font-bold tracking-tight">
-          {navLinks.map((link) => (
-            <div
-              key={link.label}
-              onMouseEnter={() => setActiveMenuType(link.menuType)}
-              className="relative py-1"
-            >
-              <Link 
-                to={link.path}
-                className={`flex items-center gap-1.5 transition-colors border-b-2 py-0.5 ${
-                  activeMenuType === link.menuType
-                    ? 'border-white text-white font-extrabold'
-                    : 'border-transparent text-white hover:text-neutral-300'
-                }`}
+        {/* Left Section: Mobile Menu Toggle + Logo + Nav Links */}
+        <div className="flex items-center gap-4 xl:gap-6">
+          {/* Mobile Hamburger */}
+          <button 
+            className="xl:hidden p-1.5 text-white hover:text-neutral-300 -ml-1.5"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+
+          {/* Logo */}
+          <div className="flex-shrink-0">
+            <Link to="/" className="inline-block py-0.5">
+              <img 
+                src={logoImg} 
+                alt="Amaré Logo" 
+                className="h-10 sm:h-12 w-auto object-contain hover:opacity-90 transition-opacity" 
+                style={{ imageRendering: 'crisp-edges' }}
+              />
+            </Link>
+          </div>
+
+          {/* Desktop Category Links */}
+          <div className="hidden xl:flex items-center space-x-6 text-[13px] font-bold tracking-tight ml-2">
+            {navLinks.map((link) => (
+              <div
+                key={link.label}
+                onMouseEnter={() => setActiveMenuType(link.menuType)}
+                className="relative py-1"
               >
-                <span className="text-xs">{link.icon}</span>
-                <span>{link.label}</span>
-              </Link>
-            </div>
-          ))}
-        </div>
-
-        {/* Mobile Hamburger */}
-        <button 
-          className="xl:hidden p-1.5 text-white hover:text-neutral-300"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          aria-label="Toggle menu"
-        >
-          {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
-
-        {/* Centered Logo (exact elf styling) */}
-        <div className="flex-shrink-0">
-          <Link to="/" className="inline-block py-0.5">
-            <span className="text-3xl sm:text-4xl font-extrabold tracking-tighter lowercase font-serif italic text-white hover:opacity-90 transition-opacity">
-              elf
-            </span>
-          </Link>
+                <Link 
+                  to={link.path}
+                  className={`flex items-center gap-1.5 transition-colors border-b-2 py-0.5 ${
+                    activeMenuType === link.menuType
+                      ? 'border-white text-white font-extrabold'
+                      : 'border-transparent text-white hover:text-neutral-300'
+                  }`}
+                >
+                  <span className="text-xs">{link.icon}</span>
+                  <span>{link.label}</span>
+                </Link>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Right Utilities */}

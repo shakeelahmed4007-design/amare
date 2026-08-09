@@ -1,8 +1,8 @@
 import React from 'react';
 
-import img1 from '../assets/7.jpg';
-import img2 from '../assets/8.jpg';
-import img3 from '../assets/26.jpg';
+import img1 from '../assets/nail1.PNG';
+import img2 from '../assets/nail2.PNG';
+import img3 from '../assets/nail3.PNG';
 
 const rewards = [
   {
@@ -46,11 +46,11 @@ export default function BeautySquadRewards() {
         <div className="w-full lg:w-2/3 grid grid-cols-1 sm:grid-cols-3 gap-6">
           {rewards.map((reward, idx) => (
             <div key={idx} className="flex flex-col group cursor-pointer">
-              <div className="w-full aspect-[4/5] overflow-hidden relative shadow-md">
+              <div className="w-full aspect-[4/5] overflow-hidden relative shadow-md bg-white p-6 group/img">
                 <img 
                   src={reward.image} 
                   alt={reward.title} 
-                  className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+                  className="w-full h-full object-contain object-center group-hover/img:scale-105 transition-transform duration-500 ease-out"
                 />
               </div>
               <div className="mt-4 flex flex-col items-start gap-1">

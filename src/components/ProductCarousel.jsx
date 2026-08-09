@@ -43,13 +43,13 @@ export default function ProductCarousel({ title, subtitle, products, onAddToCart
 
   const scroll = (direction) => {
     if (scrollRef.current) {
-      const scrollAmount = direction === 'left' ? -280 : 280;
+      const scrollAmount = direction === 'left' ? -360 : 360;
       scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
 
   return (
-    <section className="py-10 px-4 sm:px-8 max-w-[1440px] mx-auto relative group">
+    <section className="py-10 px-4 sm:px-8 max-w-[1536px] mx-auto relative group">
       {/* Header with Title & Navigation Arrows */}
       <div className="flex items-center justify-between gap-4 mb-6">
         <div>
@@ -88,7 +88,7 @@ export default function ProductCarousel({ title, subtitle, products, onAddToCart
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
         onClickCapture={handleCaptureClick}
-        className={`flex gap-4 overflow-x-auto no-scrollbar scroll-smooth pb-4 pt-1 items-stretch ${isDown ? 'cursor-grabbing' : 'cursor-grab'} select-none`}
+        className={`flex gap-5 sm:gap-6 overflow-x-auto no-scrollbar scroll-smooth pb-4 pt-1 items-stretch ${isDown ? 'cursor-grabbing' : 'cursor-grab'} select-none`}
       >
         {products.map((product) => (
           <ProductCard 

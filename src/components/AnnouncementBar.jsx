@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 const announcements = [
   { text: "Free Shipping with all orders $35+! ", linkText: "Shop Now" },
   { text: "New! Shop Pay is now available!", linkText: "" },
-  { text: "Get $4 Off! Try e.l.f. fave Halo Glow Skin Tint SPF 50 for only $14. ", linkText: "Shop Now" }
+  { text: "Get $4 Off! Try Amaré fave Halo Glow Skin Tint SPF 50 for only $14. ", linkText: "Shop Now" }
 ];
 
 export default function AnnouncementBar() {

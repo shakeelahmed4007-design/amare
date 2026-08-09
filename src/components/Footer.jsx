@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
+import logoImg from '../assets/LOGO.png';
 
 export default function Footer() {
   return (
@@ -8,9 +9,12 @@ export default function Footer() {
         
         {/* Brand & Newsletter */}
         <div className="md:col-span-2 space-y-4">
-          <span className="text-4xl font-extrabold lowercase tracking-tighter text-white block">
-            e.l.f.
-          </span>
+          <img 
+            src={logoImg} 
+            alt="Amaré Logo" 
+            className="h-12 sm:h-14 w-auto object-contain block mb-2 opacity-90" 
+            style={{ imageRendering: 'crisp-edges' }}
+          />
           <p className="text-neutral-400 text-xs max-w-sm leading-relaxed font-medium">
             Eyes. Lips. Face. Premium, 100% vegan & cruelty-free cosmetics for every eye, lip, and face.
           </p>
@@ -73,7 +77,7 @@ export default function Footer() {
 
       {/* Bottom Footer */}
       <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row items-center justify-between pt-8 text-[11px] text-neutral-500 font-bold gap-4">
-        <p>&copy; {new Date().getFullYear()} e.l.f. Cosmetics, Inc. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} Amaré Cosmetics, Inc. All rights reserved.</p>
 
         {/* Social SVGs */}
         <div className="flex space-x-5 text-neutral-400">

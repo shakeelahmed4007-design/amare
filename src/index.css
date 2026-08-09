@@ -15,6 +15,33 @@
     font-weight: 800;
     letter-spacing: -0.02em;
   }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #e2e8f0 transparent;
+  }
+
+  .dark * {
+    scrollbar-color: #334155 transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: #e2e8f0;
+    border-radius: 99px;
+  }
+
+  .dark *::-webkit-scrollbar-thumb {
+    background-color: #334155;
+  }
 }
 
 @layer utilities {

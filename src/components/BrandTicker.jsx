@@ -3,7 +3,7 @@ import React from 'react';
 const badges = [
   { label: "Cruelty Free", icon: "🐰" },
   { label: "Fair Trade Certified™", icon: "🤝" },
-  { label: "e.l.f. Clean", icon: "🧼" },
+  { label: "Amaré Clean", icon: "🧼" },
   { label: "Vegan", icon: "🌿" },
 ];
 

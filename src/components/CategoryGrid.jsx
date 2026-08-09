@@ -56,8 +56,8 @@ export default function CategoryGrid() {
       >
         {categories.map((cat) => (
           <Link 
-            key={cat.title} 
-            to={`/shop?cat=${cat.title}`}
+            key={cat.slug || cat.title} 
+            to={`/shop?cat=${cat.slug || cat.title}`}
             onClick={handleClick}
             draggable="false"
             // Exactly matching the original grid widths: 50% on mobile, 25% on desktop

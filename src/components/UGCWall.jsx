@@ -10,7 +10,7 @@ import imgE from '../assets/14.jpg';
 const ugcPosts = [
   {
     image: imgA,
-    caption: "I've been loving the e.l.f. Never Thirsty Moisturizing Shampoo & Conditioner! The shampoo creates a rich, gentle lather...",
+    caption: "I've been loving the Amaré Never Thirsty Moisturizing Shampoo & Conditioner! The shampoo creates a rich, gentle lather...",
     hasPlay: false
   },
   {
@@ -39,13 +39,13 @@ export default function UGCWall() {
   return (
     <section className="py-14 px-4 sm:px-8 max-w-[1440px] mx-auto text-center">
       <h2 className="text-4xl sm:text-5xl font-black lowercase tracking-tighter text-black mb-2">
-        e.l.f. on you
+        Amaré on you
       </h2>
       <p className="text-xs sm:text-sm text-neutral-600 font-medium max-w-xl mx-auto mb-3">
         Get instant access right here and wow. Where everyone can own their beauty, without compromise.
       </p>
       <div className="inline-block bg-indigo-100 text-indigo-900 text-xs font-black px-4 py-1 rounded-md mb-8 tracking-wider">
-        #elfingamazing
+        #amareamazing
       </div>
 
       <div className="flex overflow-x-auto pb-4 no-scrollbar gap-4 md:grid md:grid-cols-5 md:overflow-x-visible md:pb-0">
