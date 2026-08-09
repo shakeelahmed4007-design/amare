@@ -4,7 +4,7 @@ import { Play } from 'lucide-react';
 import imgA from '../assets/p1.png';
 import imgB from '../assets/p1.png';
 import imgC from '../assets/p1.png';
-import imgD from '../assets/13.jpg';
+import imgD from '../assets/p1.png';
 import imgE from '../assets/p1.png';
 
 const ugcPosts = [
@@ -32,6 +32,31 @@ const ugcPosts = [
     image: imgE,
     caption: "It's giving grape juice 🍇✨ cheek + lip combo with dark cocoa glow reviver...",
     hasPlay: true
+  },
+  {
+    image: imgA,
+    caption: "The hydration is unreal. 💧 My skin has never felt this plump and glowing!",
+    hasPlay: false
+  },
+  {
+    image: imgB,
+    caption: "Obsessed with the finish of this foundation. It looks just like skin but better.",
+    hasPlay: false
+  },
+  {
+    image: imgC,
+    caption: "A quick 5-minute routine featuring my absolute favorites. ✨",
+    hasPlay: true
+  },
+  {
+    image: imgD,
+    caption: "The ultimate lip combo for the perfect everyday pout. 💋",
+    hasPlay: true
+  },
+  {
+    image: imgE,
+    caption: "Never leaving the house without this blush again. The pigment is insane!",
+    hasPlay: false
   }
 ];
 
