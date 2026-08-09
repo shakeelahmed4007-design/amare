@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import bundleImg from '../assets/12.jpg';
+import bundleImg from '../assets/p1.png';
 
 export default function FlashSale() {
   const [timeLeft, setTimeLeft] = useState({

@@ -1,14 +1,14 @@
 import p1 from '../assets/p1.png';
 import p2 from '../assets/p2.png';
-import p3 from '../assets/p3.png';
-import p4 from '../assets/p4.png';
-import p5 from '../assets/p5.png';
-import p6 from '../assets/p6.png';
-import p7 from '../assets/p7.png';
-import p8 from '../assets/p8.png';
-import p9 from '../assets/p9.png';
-import img_aa from '../assets/aa.PNG';
-import img_aaa from '../assets/aaa.PNG';
+import p3 from '../assets/12.PNG';
+import p4 from '../assets/14.PNG';
+import p5 from '../assets/6.PNG';
+import p6 from '../assets/q.PNG';
+import p7 from '../assets/r.PNG';
+import p8 from '../assets/s.PNG';
+import p9 from '../assets/w.PNG';
+import img_aa from '../assets/12.PNG';
+import img_aaa from '../assets/14.PNG';
 import img_w from '../assets/w.PNG';
 import img_t from '../assets/t.PNG';
 import img_s from '../assets/s.PNG';
@@ -286,8 +286,8 @@ export const initialProducts = [
     type: "Physical",
     stock_quantity: 30,
     status: "Active",
-    images: ["https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&q=80&w=800"],
-    image: "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&q=80&w=800",
+    images: [p1],
+    image: p1,
     whyYoullLoveIt: [
       "Lightweight, non-greasy formula",
       "Hydrates and plumps the skin",
@@ -312,8 +312,8 @@ export const initialProducts = [
     type: "Physical",
     stock_quantity: 55,
     status: "Active",
-    images: ["https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=80&w=800"],
-    image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=80&w=800",
+    images: [p1],
+    image: p1,
     whyYoullLoveIt: [
       "Lightweight, non-greasy formula",
       "Hydrates and plumps the skin",
@@ -338,8 +338,8 @@ export const initialProducts = [
     type: "Physical",
     stock_quantity: 90,
     status: "Active",
-    images: ["https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=80&w=800"],
-    image: "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=80&w=800",
+    images: [p1],
+    image: p1,
     whyYoullLoveIt: [
       "Lightweight, non-greasy formula",
       "Hydrates and plumps the skin",
@@ -365,8 +365,8 @@ export const initialProducts = [
     type: "Physical",
     stock_quantity: 75,
     status: "Active",
-    images: ["https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&q=80&w=800"],
-    image: "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&q=80&w=800",
+    images: [p1],
+    image: p1,
     whyYoullLoveIt: [
       "Lightweight, non-greasy formula",
       "Hydrates and plumps the skin",
@@ -391,8 +391,8 @@ export const initialProducts = [
     type: "Physical",
     stock_quantity: 110,
     status: "Active",
-    images: ["https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=800"],
-    image: "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=800",
+    images: [p1],
+    image: p1,
     whyYoullLoveIt: [
       "Lightweight, non-greasy formula",
       "Hydrates and plumps the skin",
@@ -417,8 +417,8 @@ export const initialProducts = [
     type: "Physical",
     stock_quantity: 60,
     status: "Active",
-    images: ["https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&q=80&w=800"],
-    image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&q=80&w=800",
+    images: [p1],
+    image: p1,
     whyYoullLoveIt: [
       "Lightweight, non-greasy formula",
       "Hydrates and plumps the skin",
@@ -444,8 +444,8 @@ export const initialProducts = [
     type: "Physical",
     stock_quantity: 45,
     status: "Active",
-    images: ["https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&q=80&w=800"],
-    image: "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&q=80&w=800",
+    images: [p1],
+    image: p1,
     whyYoullLoveIt: [
       "Lightweight, non-greasy formula",
       "Hydrates and plumps the skin",
@@ -470,8 +470,8 @@ export const initialProducts = [
     type: "Physical",
     stock_quantity: 80,
     status: "Active",
-    images: ["https://images.unsplash.com/photo-1591360236480-4ed861025fa1?auto=format&fit=crop&q=80&w=800"],
-    image: "https://images.unsplash.com/photo-1591360236480-4ed861025fa1?auto=format&fit=crop&q=80&w=800",
+    images: [p1],
+    image: p1,
     whyYoullLoveIt: [
       "Lightweight, non-greasy formula",
       "Hydrates and plumps the skin",
@@ -496,8 +496,8 @@ export const initialProducts = [
     type: "Physical",
     stock_quantity: 100,
     status: "Active",
-    images: ["https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&q=80&w=800"],
-    image: "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&q=80&w=800",
+    images: [p1],
+    image: p1,
     whyYoullLoveIt: [
       "Lightweight, non-greasy formula",
       "Hydrates and plumps the skin",

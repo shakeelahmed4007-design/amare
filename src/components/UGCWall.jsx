@@ -1,11 +1,11 @@
 import React from 'react';
 import { Play } from 'lucide-react';
 
-import imgA from '../assets/10.jpg';
-import imgB from '../assets/11.jpg';
-import imgC from '../assets/12.jpg';
+import imgA from '../assets/p1.png';
+import imgB from '../assets/p1.png';
+import imgC from '../assets/p1.png';
 import imgD from '../assets/13.jpg';
-import imgE from '../assets/14.jpg';
+import imgE from '../assets/p1.png';
 
 const ugcPosts = [
   {

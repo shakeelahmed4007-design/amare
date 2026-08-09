@@ -2,16 +2,16 @@ import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import img1 from '../assets/1.jpg';
-import img2 from '../assets/2.jpg';
-import img3 from '../assets/3.jpg';
-import img4 from '../assets/4.jpg';
-import img5 from '../assets/5.jpg';
-import img6 from '../assets/6.jpg';
-import img7 from '../assets/7.jpg';
+import img1 from '../assets/p1.png';
+import img2 from '../assets/p1.png';
+import img3 from '../assets/p1.png';
+import img4 from '../assets/p1.png';
+import img5 from '../assets/p1.png';
+import img6 from '../assets/p1.png';
+import img7 from '../assets/p1.png';
 import img8 from '../assets/8.jpg';
-import img9 from '../assets/9.jpg';
-import img10 from '../assets/10.jpg';
+import img9 from '../assets/p1.png';
+import img10 from '../assets/p1.png';
 
 const categories = [
   { id: 1, name: "Pastel Essentials", image: img1 },

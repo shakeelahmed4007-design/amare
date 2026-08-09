@@ -14,7 +14,7 @@ import hair1 from '../assets/hair1.PNG';
 import Shampoo from '../assets/Shampoo.PNG';
 import skin1 from '../assets/skin1.PNG';
 import set1 from '../assets/set1.PNG';
-import brush1 from '../assets/bursh1.PNG';
+import brush1 from '../assets/p1.png';
 
 const categoryFallbacks = {
   nails: [nail1, nail2, nail3],

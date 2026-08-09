@@ -1,17 +1,17 @@
 import p1 from '../assets/p1.png';
 import p2 from '../assets/p2.png';
-import p3 from '../assets/p3.png';
-import p4 from '../assets/p4.png';
-import p5 from '../assets/p5.png';
-import p6 from '../assets/p6.png';
-import p7 from '../assets/p7.png';
-import p8 from '../assets/p8.png';
-import p9 from '../assets/p9.png';
+import p3 from '../assets/12.PNG';
+import p4 from '../assets/14.PNG';
+import p5 from '../assets/6.PNG';
+import p6 from '../assets/q.PNG';
+import p7 from '../assets/r.PNG';
+import p8 from '../assets/s.PNG';
+import p9 from '../assets/w.PNG';
 
 // Category Images
 import faceImg from '../assets/Face1.PNG';
 import lipsImg from '../assets/lips1.PNG';
-import brushImg from '../assets/bursh1.PNG';
+import brushImg from '../assets/12.PNG';
 import nailImg from '../assets/nail1.PNG';
 import makeupImg from '../assets/cosmatic1.PNG';
 import hairImg from '../assets/hair1.PNG';
@@ -160,7 +160,7 @@ export const products = [
     buttonText: "SELECT SHADE",
     shades: ["#fbcfe8", "#d97706"],
     category: "makeup",
-    image: "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&q=80&w=800"
+    image: p1
   },
   {
     id: 11,
@@ -173,7 +173,7 @@ export const products = [
     price: 7,
     buttonText: "ADD TO BAG",
     category: "makeup",
-    image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=80&w=800"
+    image: p1
   },
   {
     id: 12,
@@ -186,7 +186,7 @@ export const products = [
     price: 10,
     buttonText: "ADD TO BAG",
     category: "makeup",
-    image: "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=80&w=800"
+    image: p1
   },
   {
     id: 13,
@@ -200,7 +200,7 @@ export const products = [
     buttonText: "SELECT SHADE",
     shades: ["#fda4af", "#f43f5e"],
     category: "lips",
-    image: "https://images.unsplash.com/photo-1586495777744-4413f21062fa?auto=format&fit=crop&q=80&w=800"
+    image: p1
   },
   {
     id: 14,
@@ -213,7 +213,7 @@ export const products = [
     price: 3,
     buttonText: "ADD TO BAG",
     category: "eyes",
-    image: "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=800"
+    image: p1
   },
   {
     id: 15,
@@ -226,7 +226,7 @@ export const products = [
     price: 13,
     buttonText: "ADD TO BAG",
     category: "skincare",
-    image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&q=80&w=800"
+    image: p1
   },
   {
     id: 16,
@@ -240,7 +240,7 @@ export const products = [
     buttonText: "SELECT SHADE",
     shades: ["#fef08a", "#d97706"],
     category: "makeup",
-    image: "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&q=80&w=800"
+    image: p1
   },
   {
     id: 17,
@@ -253,7 +253,7 @@ export const products = [
     price: 3,
     buttonText: "ADD TO BAG",
     category: "eyes",
-    image: "https://images.unsplash.com/photo-1591360236480-4ed861025fa1?auto=format&fit=crop&q=80&w=800"
+    image: p1
   },
   {
     id: 18,
@@ -266,7 +266,7 @@ export const products = [
     price: 10,
     buttonText: "ADD TO BAG",
     category: "makeup",
-    image: "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&q=80&w=800"
+    image: p1
   }
 ];
 
@@ -294,7 +294,7 @@ export const featuredCallouts = [
       reviews: 709,
       price: 10,
       buttonText: "ADD TO BAG",
-      image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&q=80&w=800"
+      image: p1
     }
   },
   {
@@ -308,7 +308,7 @@ export const featuredCallouts = [
       reviews: 9548,
       price: 14,
       buttonText: "ADD TO BAG",
-      image: "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?auto=format&fit=crop&q=80&w=800"
+      image: p1
     }
   },
   {
@@ -322,7 +322,7 @@ export const featuredCallouts = [
       reviews: 1022,
       price: 10,
       buttonText: "ADD TO BAG",
-      image: "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&q=80&w=800"
+      image: p1
     }
   }
 ];

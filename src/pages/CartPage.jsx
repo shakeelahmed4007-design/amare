@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Minus, Plus, Trash2, ShieldCheck, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import img1 from '../assets/1.jpg';
-import img2 from '../assets/2.jpg';
+import img1 from '../assets/p1.png';
+import img2 from '../assets/p1.png';
 
 export default function CartPage() {
   const [cartItems, setCartItems] = useState([

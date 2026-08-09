@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-import p4 from '../assets/p4.png';
-import p3 from '../assets/p3.png';
-import p2 from '../assets/p2.png';
+import banner1 from '../assets/banner1.jpg';
+import banner2 from '../assets/banner2.jpg';
+import banner3 from '../assets/banner3.jpg';
+import banner4 from '../assets/banner4.jpg';
+import banner5 from '../assets/banner5.jpg';
 
 const slides = [
   {
@@ -12,7 +14,7 @@ const slides = [
     title: "lock the glow.\nown the look.",
     subtitle: "Say goodbye to melting makeup. Meet the ultimate luminous, makeup-locking duo that holds your look all day long.",
     buttonText: "Explore The Duo",
-    image: p4,
+    image: banner1,
     tagColor: "text-pink-400"
   },
   {
@@ -21,7 +23,7 @@ const slides = [
     title: "drip. drop.\nshine won't stop.",
     subtitle: "Strengthen, protect, and gloss. Infused with weightless nutrients for a mirror-like shine that shields from heat.",
     buttonText: "Shop Gloss Mode",
-    image: p3,
+    image: banner2,
     tagColor: "text-amber-400",
     disclaimer: "*Compared to untreated hair."
   },
@@ -31,8 +33,27 @@ const slides = [
     title: "power grip\nyour routine.",
     subtitle: "The award-winning, makeup-locking primer collection designed for ultimate hydration and 16-hour hold.",
     buttonText: "Shop the Collection",
-    image: p2,
+    image: banner3,
     tagColor: "text-cyan-400"
+  },
+  {
+    id: 4,
+    tag: "NEW IN SKINCARE",
+    title: "lock the glow.\nown the look.",
+    subtitle: "Say goodbye to melting makeup. Meet the ultimate luminous, makeup-locking duo that holds your look all day long.",
+    buttonText: "Explore The Duo",
+    image: banner4,
+    tagColor: "text-pink-400"
+  },
+  {
+    id: 5,
+    tag: "HAIRCARE REVOLUTION",
+    title: "drip. drop.\nshine won't stop.",
+    subtitle: "Strengthen, protect, and gloss. Infused with weightless nutrients for a mirror-like shine that shields from heat.",
+    buttonText: "Shop Gloss Mode",
+    image: banner5,
+    tagColor: "text-amber-400",
+    disclaimer: "*Compared to untreated hair."
   }
 ];
 
@@ -53,7 +74,7 @@ export default function HeroSlider() {
   }, [nextSlide]);
 
   return (
-    <div className="w-full relative h-[70vh] sm:h-[80vh] min-h-[550px] max-h-[750px] overflow-hidden bg-neutral-900 group">
+    <div className="w-full relative h-[85vh] sm:h-[95vh] min-h-[700px] max-h-[950px] overflow-hidden bg-neutral-900 group">
       {/* Slides Container */}
       <div className="relative w-full h-full">
         {slides.map((slide, idx) => {
