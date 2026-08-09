@@ -1,11 +1,11 @@
 import React from 'react';
 import { Play } from 'lucide-react';
 
-import imgA from '../assets/p1.png';
-import imgB from '../assets/p1.png';
-import imgC from '../assets/p1.png';
-import imgD from '../assets/p1.png';
-import imgE from '../assets/p1.png';
+import imgA from '../assets/Shampoo.PNG';
+import imgB from '../assets/hair1.PNG';
+import imgC from '../assets/skin1.PNG';
+import imgD from '../assets/lips1.PNG';
+import imgE from '../assets/Face1.PNG';
 
 const ugcPosts = [
   {
@@ -32,31 +32,6 @@ const ugcPosts = [
     image: imgE,
     caption: "It's giving grape juice 🍇✨ cheek + lip combo with dark cocoa glow reviver...",
     hasPlay: true
-  },
-  {
-    image: imgA,
-    caption: "The hydration is unreal. 💧 My skin has never felt this plump and glowing!",
-    hasPlay: false
-  },
-  {
-    image: imgB,
-    caption: "Obsessed with the finish of this foundation. It looks just like skin but better.",
-    hasPlay: false
-  },
-  {
-    image: imgC,
-    caption: "A quick 5-minute routine featuring my absolute favorites. ✨",
-    hasPlay: true
-  },
-  {
-    image: imgD,
-    caption: "The ultimate lip combo for the perfect everyday pout. 💋",
-    hasPlay: true
-  },
-  {
-    image: imgE,
-    caption: "Never leaving the house without this blush again. The pigment is insane!",
-    hasPlay: false
   }
 ];
 
@@ -77,15 +52,15 @@ export default function UGCWall() {
         {ugcPosts.map((post, idx) => (
           <div 
             key={idx} 
-            className="relative aspect-[9/16] rounded-2xl overflow-hidden group shadow-md border border-neutral-200 cursor-pointer min-w-[220px] sm:min-w-[240px] md:min-w-0 w-full flex-shrink-0"
+            className="relative aspect-[9/16] rounded-2xl overflow-hidden group shadow-md border border-neutral-200 cursor-pointer min-w-[220px] sm:min-w-[240px] md:min-w-0 w-full flex-shrink-0 bg-white"
           >
             <img 
               src={post.image} 
               alt="UGC Feed" 
               loading="lazy"
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              className="w-full h-full object-contain p-2 object-center group-hover:scale-105 transition-transform duration-500"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-between p-4 text-left">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-between p-4 text-left pointer-events-none">
               
               {/* Play Button Icon */}
               <div className="flex justify-center items-center h-full">
