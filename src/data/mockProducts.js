@@ -53,32 +53,7 @@ export const initialProducts = [
     ingredients: "Water (Aqua), Glycerin, Squalane, Niacinamide, Sodium Hyaluronate.",
     howToUse: "Apply a small amount to clean skin. Gently massage until absorbed."
   },
-  {
-    id: 2,
-    title: "Power Grip Primer",
-    badge: "HOLY GRAIL",
-    badgeColor: "bg-orange-600 text-white",
-    rating: 4.8,
-    reviews: 709,
-    description: "Gel face primer for long-lasting makeup.",
-    price: 10,
-    buttonText: "SELECT SIZE",
-    category_slug: "makeup",
-    type: "Physical",
-    stock_quantity: 120,
-    status: "Active",
-    images: [p2],
-    image: p2,
-    whyYoullLoveIt: [
-      "Lightweight, non-greasy formula",
-      "Hydrates and plumps the skin",
-      "Perfect for daily use under makeup"
-    ],
-    sizes: ["Regular 1.0 oz / 30 ml", "Mini 0.5 oz / 15 ml"],
-    details: "Great for all skin types. Provides essential benefits for your daily routine.",
-    ingredients: "Water (Aqua), Glycerin, Squalane, Niacinamide, Sodium Hyaluronate.",
-    howToUse: "Apply a small amount to clean skin. Gently massage until absorbed."
-  },
+
   {
     id: 3,
     title: "Gloss Mode Treatment Oil",

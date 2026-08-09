@@ -34,19 +34,7 @@ export const products = [
     category: "skincare",
     image: p1
   },
-  {
-    id: 2,
-    title: "Power Grip Primer",
-    badge: "HOLY GRAIL",
-    badgeColor: "bg-orange-600 text-white",
-    rating: 4.8,
-    reviews: 709,
-    description: "Gel face primer for long-lasting makeup.",
-    price: 10,
-    buttonText: "SELECT SIZE",
-    category: "makeup",
-    image: p2
-  },
+
   {
     id: 3,
     title: "Gloss Mode Treatment Oil",
