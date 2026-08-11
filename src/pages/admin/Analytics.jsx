@@ -6,27 +6,22 @@ import {
 import { TrendingUp, TrendingDown, Users, ShoppingBag, DollarSign, Download, ArrowUpRight } from 'lucide-react';
 
 const salesData = [
-  { name: 'Mon', sales: 4000, orders: 240 },
-  { name: 'Tue', sales: 3000, orders: 139 },
-  { name: 'Wed', sales: 5200, orders: 380 },
-  { name: 'Thu', sales: 2780, orders: 290 },
-  { name: 'Fri', sales: 4890, orders: 480 },
-  { name: 'Sat', sales: 6390, orders: 520 },
-  { name: 'Sun', sales: 5490, orders: 430 },
+  { name: 'Mon', sales: 0, orders: 0 },
+  { name: 'Tue', sales: 0, orders: 0 },
+  { name: 'Wed', sales: 0, orders: 0 },
+  { name: 'Thu', sales: 0, orders: 0 },
+  { name: 'Fri', sales: 0, orders: 0 },
+  { name: 'Sat', sales: 0, orders: 0 },
+  { name: 'Sun', sales: 0, orders: 0 },
 ];
 
-const topProducts = [
-  { id: 1, name: 'Power Grip Primer', sales: 1245, revenue: 12450, share: 32 },
-  { id: 2, name: 'Halo Glow Liquid Filter', sales: 982, revenue: 13748, share: 26 },
-  { id: 3, name: "O-Face Satin Lipstick", sales: 843, revenue: 7587, share: 22 },
-  { id: 4, name: 'Bite-Size Eyeshadow', sales: 654, revenue: 1962, share: 20 },
-];
+const topProducts = [];
 
 const STAT_CARDS = [
   {
     label: 'Total Revenue',
-    value: '$45,231',
-    change: '+20.1%',
+    value: '$0',
+    change: '0%',
     up: true,
     icon: DollarSign,
     color: 'text-emerald-500',
@@ -34,8 +29,8 @@ const STAT_CARDS = [
   },
   {
     label: 'Total Orders',
-    value: '3,219',
-    change: '+12.5%',
+    value: '0',
+    change: '0%',
     up: true,
     icon: ShoppingBag,
     color: 'text-blue-500',
@@ -43,8 +38,8 @@ const STAT_CARDS = [
   },
   {
     label: 'New Customers',
-    value: '844',
-    change: '+18.2%',
+    value: '0',
+    change: '0%',
     up: true,
     icon: Users,
     color: 'text-violet-500',
@@ -52,9 +47,9 @@ const STAT_CARDS = [
   },
   {
     label: 'Conversion Rate',
-    value: '3.2%',
-    change: '-1.1%',
-    up: false,
+    value: '0%',
+    change: '0%',
+    up: true,
     icon: TrendingUp,
     color: 'text-rose-500',
     bg: 'bg-rose-50 dark:bg-rose-950/30',
@@ -149,9 +144,9 @@ export function Analytics() {
               <h3 className="text-base font-black text-neutral-900 dark:text-white">Revenue Over Time</h3>
               <p className="text-xs text-neutral-400 mt-0.5">Daily revenue trend</p>
             </div>
-            <div className="flex items-center gap-1 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-2.5 py-1 rounded-full">
-              <ArrowUpRight className="w-3.5 h-3.5" />
-              +24%
+            <div className="flex items-center gap-1 text-xs font-bold text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800/50 px-2.5 py-1 rounded-full">
+              <TrendingUp className="w-3.5 h-3.5" />
+              0%
             </div>
           </div>
           <div className="h-52 sm:h-64">
@@ -180,9 +175,9 @@ export function Analytics() {
               <h3 className="text-base font-black text-neutral-900 dark:text-white">Orders Volume</h3>
               <p className="text-xs text-neutral-400 mt-0.5">Daily order count</p>
             </div>
-            <div className="flex items-center gap-1 text-xs font-bold text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/30 px-2.5 py-1 rounded-full">
-              <ArrowUpRight className="w-3.5 h-3.5" />
-              +12.5%
+            <div className="flex items-center gap-1 text-xs font-bold text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800/50 px-2.5 py-1 rounded-full">
+              <TrendingUp className="w-3.5 h-3.5" />
+              0%
             </div>
           </div>
           <div className="h-52 sm:h-64">
@@ -219,32 +214,44 @@ export function Analytics() {
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100 dark:divide-slate-800/80">
-              {topProducts.map((product, idx) => (
-                <tr key={product.id} className="hover:bg-neutral-50/80 dark:hover:bg-slate-800/30 transition-colors">
-                  <td className="py-4 pl-5 pr-4 text-xs font-black text-neutral-400">#{idx + 1}</td>
-                  <td className="px-4 py-4 text-xs font-extrabold text-neutral-900 dark:text-white">{product.name}</td>
-                  <td className="px-4 py-4 text-xs font-bold text-neutral-600 dark:text-slate-400">{product.sales.toLocaleString()}</td>
-                  <td className="px-4 py-4 text-xs font-black text-neutral-900 dark:text-white">${product.revenue.toLocaleString()}</td>
-                  <td className="px-4 py-4 pr-5">
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-1.5 bg-neutral-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full"
-                          style={{ width: `${product.share}%` }}
-                        />
-                      </div>
-                      <span className="text-[10px] font-bold text-neutral-400 w-8 text-right">{product.share}%</span>
+              {topProducts.length === 0 && (
+              <tr>
+                <td colSpan="5" className="py-8 text-center text-xs font-bold text-neutral-500">
+                  No data available yet.
+                </td>
+              </tr>
+            )}
+            {topProducts.map((product, idx) => (
+              <tr key={product.id} className="hover:bg-neutral-50/80 dark:hover:bg-slate-800/30 transition-colors">
+                <td className="py-4 pl-5 pr-4 text-xs font-black text-neutral-400">#{idx + 1}</td>
+                <td className="px-4 py-4 text-xs font-extrabold text-neutral-900 dark:text-white">{product.name}</td>
+                <td className="px-4 py-4 text-xs font-bold text-neutral-600 dark:text-slate-400">{product.sales.toLocaleString()}</td>
+                <td className="px-4 py-4 text-xs font-black text-neutral-900 dark:text-white">${product.revenue.toLocaleString()}</td>
+                <td className="px-4 py-4 pr-5">
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 h-1.5 bg-neutral-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full"
+                        style={{ width: `${product.share}%` }}
+                      />
                     </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                    <span className="text-[10px] font-bold text-neutral-400 w-8 text-right">{product.share}%</span>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-        {/* Mobile List */}
-        <div className="block sm:hidden divide-y divide-neutral-100 dark:divide-slate-800">
-          {topProducts.map((product, idx) => (
+      {/* Mobile List */}
+      <div className="block sm:hidden divide-y divide-neutral-100 dark:divide-slate-800">
+        {topProducts.length === 0 && (
+          <div className="p-8 text-center text-xs font-bold text-neutral-500">
+            No data available yet.
+          </div>
+        )}
+        {topProducts.map((product, idx) => (
             <div key={product.id} className="p-4 flex items-center gap-3">
               <span className="text-lg font-black text-neutral-200 dark:text-slate-700 w-6 shrink-0">#{idx + 1}</span>
               <div className="flex-1 min-w-0">
