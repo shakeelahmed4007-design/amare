@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { ChevronRight, ShieldCheck, ChevronDown, Check } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import StripeCheckout from '../components/StripeCheckout';
+import PayPalPaymentForm from '../components/PayPalPaymentForm';
 
 export default function Checkout({ cartItems = [] }) {
   const navigate = useNavigate();
@@ -18,7 +20,7 @@ export default function Checkout({ cartItems = [] }) {
 
   return (
     <div className="bg-white min-h-screen font-sans">
-      <div className="flex flex-col lg:flex-row min-h-screen">
+      <div className="flex flex-col-reverse lg:flex-row min-h-screen">
         
         {/* Left Panel: Forms */}
         <div className="flex-1 lg:w-[55%] xl:w-[60%] lg:border-r border-neutral-200">
@@ -48,15 +50,9 @@ export default function Checkout({ cartItems = [] }) {
                   <div className="mb-10 text-center">
                     <p className="text-[11px] text-neutral-500 mb-3 tracking-wider uppercase font-semibold">Express checkout</p>
                     <div className="flex gap-3 justify-center">
-                      <button type="button" className="flex-1 h-12 rounded bg-[#5a31f4] flex items-center justify-center text-white font-extrabold italic tracking-tight hover:opacity-90">
-                        shop <span className="bg-white text-[#5a31f4] text-[10px] px-1 py-0.5 rounded ml-1 uppercase not-italic">pay</span>
-                      </button>
-                      <button type="button" className="flex-1 h-12 rounded bg-[#f2c94c] flex items-center justify-center text-blue-900 font-bold italic hover:opacity-90">
-                        PayPal
-                      </button>
-                      <button type="button" className="flex-1 h-12 rounded bg-black flex items-center justify-center text-white font-medium hover:opacity-90">
-                        G Pay
-                      </button>
+                      <div className="w-full max-w-sm mx-auto">
+                        <PayPalPaymentForm total={total} shippingDetails={{}} />
+                      </div>
                     </div>
                   </div>
 
@@ -162,34 +158,12 @@ export default function Checkout({ cartItems = [] }) {
                   <h2 className="text-[20px] font-extrabold text-black mb-1">Payment</h2>
                   <p className="text-xs text-neutral-500 mb-6">All transactions are secure and encrypted.</p>
                   
-                  <div className="border border-neutral-300 rounded-lg bg-white overflow-hidden mb-8">
-                    {/* Credit Card Header */}
-                    <div className="bg-neutral-50 border-b border-neutral-300 p-4 flex items-center gap-3">
-                      <div className="w-4 h-4 rounded-full border-[5px] border-black bg-white"></div>
-                      <span className="font-bold text-sm">Credit card</span>
-                    </div>
-                    
-                    {/* Credit Card Form */}
-                    <div className="p-4 bg-neutral-50/30 space-y-3">
-                      <div className="relative">
-                        <input required type="text" placeholder="Card number" className="w-full p-3.5 border border-neutral-300 rounded focus:border-black focus:ring-1 focus:ring-black outline-none bg-white transition-all text-sm placeholder:text-neutral-500" />
-                        <ShieldCheck className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400 pointer-events-none" />
-                      </div>
-                      <input required type="text" placeholder="Name on card" className="w-full p-3.5 border border-neutral-300 rounded focus:border-black focus:ring-1 focus:ring-black outline-none bg-white transition-all text-sm placeholder:text-neutral-500" />
-                      <div className="grid grid-cols-2 gap-3">
-                        <input required type="text" placeholder="Expiration date (MM / YY)" className="w-full p-3.5 border border-neutral-300 rounded focus:border-black focus:ring-1 focus:ring-black outline-none bg-white transition-all text-sm placeholder:text-neutral-500" />
-                        <input required type="text" placeholder="Security code" className="w-full p-3.5 border border-neutral-300 rounded focus:border-black focus:ring-1 focus:ring-black outline-none bg-white transition-all text-sm placeholder:text-neutral-500" />
-                      </div>
-                    </div>
-                  </div>
+                  <StripeCheckout total={total} shippingDetails={{}} />
 
                   <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                     <span className="text-[13px] text-neutral-600 hover:text-black flex items-center gap-1 cursor-pointer" onClick={() => setStep(1)}>
                       <ChevronRight className="w-3.5 h-3.5 rotate-180" /> Return to shipping
                     </span>
-                    <button type="submit" className="w-full sm:w-auto px-10 py-4 bg-black text-white rounded font-extrabold text-[13px] tracking-wider uppercase hover:bg-neutral-800 transition-colors shadow-lg">
-                      Pay now
-                    </button>
                   </div>
                 </div>
               )}

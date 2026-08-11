@@ -33,7 +33,7 @@ const categoryFallbacks = {
 export default function Product({ onAddToCart }) {
   const { id } = useParams();
   const { products, getSubscribedPrice, getTieredPrice } = useStore();
-  
+
   const targetProduct = products.find(p => String(p.id) === String(id)) || products[0];
 
   const getFallbackImages = (p) => {
@@ -44,10 +44,10 @@ export default function Product({ onAddToCart }) {
   };
 
   // Ensure we use category-specific images for the gallery
-  const baseImages = targetProduct?.images?.length > 1 
-    ? targetProduct.images 
+  const baseImages = targetProduct?.images?.length > 1
+    ? targetProduct.images
     : getFallbackImages(targetProduct);
-  
+
   // Remove duplicates if the main image happens to be one of the fallbacks
   const galleryImages = Array.from(new Set(baseImages.filter(Boolean))).slice(0, 5);
 
@@ -55,12 +55,12 @@ export default function Product({ onAddToCart }) {
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState(targetProduct?.sizes?.[0] || 'Regular 1.0 oz / 30 ml');
   const [purchaseType, setPurchaseType] = useState('one-time'); // 'one-time' or 'subscribe'
-  
+
   const [openAccordion, setOpenAccordion] = useState({ details: true, ingredients: false, howToUse: false });
 
   useEffect(() => {
-    const baseImgs = targetProduct?.images?.length > 1 
-      ? targetProduct.images 
+    const baseImgs = targetProduct?.images?.length > 1
+      ? targetProduct.images
       : getFallbackImages(targetProduct);
     const imgs = Array.from(new Set(baseImgs.filter(Boolean))).slice(0, 5);
     setActiveImage(imgs[0]);
@@ -77,7 +77,7 @@ export default function Product({ onAddToCart }) {
   // Base price
   const basePrice = getTieredPrice(targetProduct, quantity);
   const subscribePrice = getSubscribedPrice({ ...targetProduct, price: basePrice });
-  
+
   const finalUnitPrice = purchaseType === 'subscribe' ? subscribePrice : basePrice;
   const originalPrice = targetProduct.originalPrice || (basePrice * 1.2).toFixed(2); // Mock original price if missing
 
@@ -97,18 +97,18 @@ export default function Product({ onAddToCart }) {
 
   return (
     <div className="bg-white min-h-screen font-sans pb-24">
-      
+
       {/* Breadcrumb */}
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 py-4 text-xs font-semibold text-neutral-500 border-b border-neutral-100">
-        <Link to="/" className="hover:text-black">Home</Link> / 
-        <Link to="/shop" className="hover:text-black mx-1">Shop</Link> / 
-        <span className="capitalize mx-1">{targetProduct.category_slug || 'Cosmetics'}</span> / 
+        <Link to="/" className="hover:text-black">Home</Link> /
+        <Link to="/shop" className="hover:text-black mx-1">Shop</Link> /
+        <span className="capitalize mx-1">{targetProduct.category_slug || 'Cosmetics'}</span> /
         <span className="font-bold text-black ml-1">{targetProduct.title}</span>
       </div>
 
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 py-8">
         <div className="flex flex-col lg:flex-row gap-10 lg:gap-12 items-start">
-          
+
           {/* Left Column: Image Gallery (Vertical Thumbnails) */}
           <div className="w-full lg:w-[55%] flex flex-col-reverse sm:flex-row gap-4">
             {/* Vertical Thumbnails (Only show if multiple images exist) */}
@@ -118,9 +118,8 @@ export default function Product({ onAddToCart }) {
                   <button
                     key={idx}
                     onClick={() => setActiveImage(img)}
-                    className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 bg-neutral-50 ${
-                      activeImage === img ? 'border-black ring-2 ring-black/10' : 'border-neutral-200 hover:border-neutral-400'
-                    }`}
+                    className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 bg-neutral-50 ${activeImage === img ? 'border-black ring-2 ring-black/10' : 'border-neutral-200 hover:border-neutral-400'
+                      }`}
                   >
                     <img src={img} alt="Thumbnail" className="w-full h-full object-contain p-1" />
                   </button>
@@ -135,9 +134,9 @@ export default function Product({ onAddToCart }) {
                   {targetProduct.badge}
                 </div>
               )}
-              <img 
-                src={activeImage} 
-                alt={targetProduct.title} 
+              <img
+                src={activeImage}
+                alt={targetProduct.title}
                 className="w-full h-full object-contain group-hover/img:scale-105 transition-transform duration-500"
               />
             </div>
@@ -145,7 +144,7 @@ export default function Product({ onAddToCart }) {
 
           {/* Right Column: Product Purchasing Details */}
           <div className="w-full lg:w-[45%] space-y-6">
-            
+
             {/* Title & Rating */}
             <div>
               <h1 className="text-3xl sm:text-[40px] font-black text-black tracking-tight leading-none mb-3">
@@ -201,11 +200,10 @@ export default function Product({ onAddToCart }) {
                     <button
                       key={idx}
                       onClick={() => setSelectedSize(size)}
-                      className={`px-4 py-2 text-sm font-bold rounded-full border-2 transition-all ${
-                        selectedSize === size 
-                          ? 'border-black bg-black text-white' 
+                      className={`px-4 py-2 text-sm font-bold rounded-full border-2 transition-all ${selectedSize === size
+                          ? 'border-black bg-black text-white'
                           : 'border-neutral-200 bg-white text-black hover:border-black'
-                      }`}
+                        }`}
                     >
                       {size}
                     </button>
@@ -217,7 +215,7 @@ export default function Product({ onAddToCart }) {
             {/* Purchase Box */}
             <div className="border border-neutral-200 rounded-2xl overflow-hidden bg-white">
               {/* One Time Purchase Option */}
-              <div 
+              <div
                 className={`p-4 border-b border-neutral-200 cursor-pointer transition-colors ${purchaseType === 'one-time' ? 'bg-neutral-50' : 'hover:bg-neutral-50/50'}`}
                 onClick={() => setPurchaseType('one-time')}
               >
@@ -258,7 +256,7 @@ export default function Product({ onAddToCart }) {
               </div>
 
               {/* Subscribe Option */}
-              <div 
+              <div
                 className={`p-4 cursor-pointer transition-colors ${purchaseType === 'subscribe' ? 'bg-neutral-50' : 'hover:bg-neutral-50/50'}`}
                 onClick={() => setPurchaseType('subscribe')}
               >
@@ -271,7 +269,7 @@ export default function Product({ onAddToCart }) {
                   </div>
                   <span className="font-bold text-pink-600">${subscribePrice}</span>
                 </div>
-                
+
                 {purchaseType === 'subscribe' && (
                   <div className="flex flex-col gap-3 pl-8 mt-4">
                     <p className="text-xs font-medium text-neutral-600 mb-2">
@@ -316,7 +314,7 @@ export default function Product({ onAddToCart }) {
             <div className="border-b border-neutral-200">
               {/* Details Accordion */}
               <div className="border-t border-neutral-200">
-                <button 
+                <button
                   onClick={() => toggleAccordion('details')}
                   className="w-full flex items-center justify-between py-4 focus:outline-none"
                 >
@@ -332,7 +330,7 @@ export default function Product({ onAddToCart }) {
 
               {/* Ingredients Accordion */}
               <div className="border-t border-neutral-200">
-                <button 
+                <button
                   onClick={() => toggleAccordion('ingredients')}
                   className="w-full flex items-center justify-between py-4 focus:outline-none"
                 >
@@ -349,7 +347,7 @@ export default function Product({ onAddToCart }) {
 
               {/* How to Use Accordion */}
               <div className="border-t border-neutral-200">
-                <button 
+                <button
                   onClick={() => toggleAccordion('howToUse')}
                   className="w-full flex items-center justify-between py-4 focus:outline-none"
                 >
@@ -377,10 +375,10 @@ export default function Product({ onAddToCart }) {
 
         {/* Pairs Well With Carousel */}
         <div className="mt-16 pt-8 border-t border-neutral-200">
-          <ProductCarousel 
-            title="Pairs Well With" 
-            products={products.filter(p => p.id !== targetProduct.id).slice(0, 8)} 
-            onAddToCart={onAddToCart} 
+          <ProductCarousel
+            title="Pairs Well With"
+            products={products.filter(p => p.id !== targetProduct.id).slice(0, 8)}
+            onAddToCart={onAddToCart}
           />
         </div>
 

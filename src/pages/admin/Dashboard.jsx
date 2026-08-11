@@ -217,9 +217,11 @@ export function Dashboard() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <span className="font-bold text-xs text-neutral-900 dark:text-white">{log.action}</span>
-                      <span className="text-[10px] text-neutral-400 shrink-0">{log.timestamp}</span>
+                      <span className="text-[10px] text-neutral-400 shrink-0">{new Date(log.created_at).toLocaleDateString()}</span>
                     </div>
-                    <p className="text-xs text-neutral-500 dark:text-slate-400 mt-0.5 leading-relaxed">{log.detail}</p>
+                    <p className="text-xs text-neutral-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+                      {log.description} <span className="text-[10px] ml-1 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">by {log.profiles?.full_name || 'User'}</span>
+                    </p>
                   </div>
                 </div>
               ))

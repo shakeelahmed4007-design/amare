@@ -64,6 +64,45 @@ export function Categories() {
     setIsModalOpen(false);
   };
 
+  const [isAddingParentCategory, setIsAddingParentCategory] = useState(false);
+  const [newParentCategoryName, setNewParentCategoryName] = useState('');
+
+  const handleParentCategoryChange = (e) => {
+    if (e.target.value === 'add_new_category') {
+      setIsAddingParentCategory(true);
+    } else {
+      setFormData({ ...formData, parentId: e.target.value });
+    }
+  };
+
+  const submitNewParentCategory = async () => {
+    if (!newParentCategoryName.trim()) {
+       setIsAddingParentCategory(false);
+       return;
+    }
+    const nameStr = newParentCategoryName.trim();
+    // Case-insensitive match check
+    const existing = categories.find(c => c.name.toLowerCase() === nameStr.toLowerCase());
+    if (existing) {
+      setFormData({ ...formData, parentId: existing.id });
+      setIsAddingParentCategory(false);
+      setNewParentCategoryName('');
+      return;
+    }
+
+    try {
+      const slug = nameStr.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const created = await addCategory({ name: nameStr, slug });
+      setFormData({ ...formData, parentId: created.id });
+      setIsAddingParentCategory(false);
+      setNewParentCategoryName('');
+      setToastMessage('');
+    } catch (err) {
+      console.error(err);
+      setToastMessage("Failed to create category: " + (err.message || String(err)));
+    }
+  };
+
   const handleDelete = async () => {
     if (!deleteTarget) return;
     await deleteCategory(deleteTarget.id);
@@ -227,16 +266,42 @@ export function Categories() {
                 <label className="block text-xs font-bold uppercase tracking-wider text-admin-muted mb-1">
                   Parent Category (Optional - for Subcategories)
                 </label>
-                <select
-                  value={formData.parentId}
-                  onChange={(e) => setFormData({ ...formData, parentId: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-admin-bg dark:bg-slate-800 border border-admin-border dark:border-admin-darkBorder rounded-xl text-sm font-semibold outline-none text-admin-text dark:text-admin-darkText"
-                >
-                  <option value="">None (Top-Level Category)</option>
-                  {parentCategories.map(p => (
-                    <option key={p.id} value={p.id}>{p.name}</option>
-                  ))}
-                </select>
+                {!isAddingParentCategory ? (
+                  <select
+                    value={formData.parentId || ''}
+                    onChange={handleParentCategoryChange}
+                    className="w-full px-4 py-2.5 bg-admin-bg dark:bg-slate-800 border border-admin-border dark:border-admin-darkBorder rounded-xl text-sm font-semibold outline-none text-admin-text dark:text-admin-darkText capitalize"
+                  >
+                    <option value="">None (Top-Level Category)</option>
+                    {parentCategories.map(p => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                    <option value="add_new_category" className="font-bold text-cyan-600 bg-neutral-100 dark:bg-slate-700">
+                      + Add new category
+                    </option>
+                  </select>
+                ) : (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      autoFocus
+                      value={newParentCategoryName}
+                      onChange={(e) => setNewParentCategoryName(e.target.value)}
+                      placeholder="New category..."
+                      className="flex-1 px-3 py-2 bg-admin-bg dark:bg-slate-800 border border-admin-border dark:border-admin-darkBorder rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-cyan-500 text-admin-text dark:text-admin-darkText"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') { e.preventDefault(); submitNewParentCategory(); }
+                        if (e.key === 'Escape') { setIsAddingParentCategory(false); setNewParentCategoryName(''); }
+                      }}
+                    />
+                    <button type="button" onClick={submitNewParentCategory} className="px-3 py-2 bg-cyan-600 text-white rounded-xl text-sm font-bold hover:bg-cyan-700 transition-colors">
+                      Add
+                    </button>
+                    <button type="button" onClick={() => {setIsAddingParentCategory(false); setNewParentCategoryName('');}} className="px-3 py-2 bg-neutral-200 dark:bg-slate-700 text-neutral-700 dark:text-slate-300 rounded-xl text-sm font-bold hover:bg-neutral-300 dark:hover:bg-slate-600 transition-colors">
+                      Cancel
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div>

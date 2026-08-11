@@ -27,10 +27,10 @@ export default function ProductCard({ product, onAddToCart, className = "" }) {
     e.preventDefault();
     e.stopPropagation();
     if (onAddToCart) {
-      onAddToCart({ 
-        ...product, 
+      onAddToCart({
+        ...product,
         image: product.image || (product.images && product.images[0]) || '',
-        selectedShade 
+        selectedShade
       });
     }
     setAdded(true);
@@ -51,9 +51,9 @@ export default function ProductCard({ product, onAddToCart, className = "" }) {
       {/* Top Product Image (Edge to Edge, Square Shape) */}
       <Link to={`/product/${product.id}`} className="block relative z-10 w-full group/img">
         <div className="relative w-full aspect-square flex items-center justify-center bg-white overflow-hidden p-6">
-          <img 
-            src={product.image || (product.images && product.images[0]) || ''} 
-            alt={product.title} 
+          <img
+            src={product.image || (product.images && product.images[0]) || ''}
+            alt={product.title}
             loading="lazy"
             className="w-full h-full object-contain object-center group-hover/img:scale-105 transition-transform duration-500 ease-out"
           />
@@ -62,7 +62,7 @@ export default function ProductCard({ product, onAddToCart, className = "" }) {
 
       {/* Content Wrapper */}
       <div className="flex flex-col flex-grow p-4 sm:p-5 bg-white relative z-10">
-        
+
         {/* Main Product Info */}
         <div className="flex flex-col flex-grow">
           {/* Star Rating & Review Count */}
@@ -125,8 +125,8 @@ export default function ProductCard({ product, onAddToCart, className = "" }) {
           <button
             onClick={handleAdd}
             className={`border border-black font-extrabold text-[11px] sm:text-[12px] py-2.5 px-5 rounded-full transition-all duration-300 uppercase tracking-[0.12em] text-center whitespace-nowrap active:scale-95 ${added
-                ? 'bg-black text-white'
-                : 'bg-white text-black hover:bg-black hover:text-white'
+              ? 'bg-black text-white'
+              : 'bg-white text-black hover:bg-black hover:text-white'
               }`}
           >
             {added ? 'ADDED' : (product.buttonText || "ADD TO BAG")}

@@ -45,7 +45,7 @@ export function Roles() {
     
     try {
       const { data, error } = await supabase
-        .from('admin_users')
+        .from('profiles')
         .select('*');
         
       if (error) {
@@ -53,12 +53,8 @@ export function Roles() {
       }
       setAdmins(data || []);
     } catch (err) {
-      console.warn("Could not fetch from admin_users directly (likely due to Supabase Auth restrictions on frontend). Loading dummy data for UI demonstration.");
-      setAdmins([
-        { id: '1', user_id: 'user-1', email: 'owner@cosmatic.com', role: 'super_admin', created_at: new Date().toISOString() },
-        { id: '2', user_id: 'user-2', email: 'manager@cosmatic.com', role: 'admin', created_at: new Date().toISOString() },
-        { id: '3', user_id: 'user-3', email: 'content@cosmatic.com', role: 'editor', created_at: new Date().toISOString() },
-      ]);
+      console.warn("Error fetching profiles:", err.message);
+      setAdmins([]);
     } finally {
       setLoading(false);
     }

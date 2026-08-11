@@ -1,67 +1,71 @@
-import { initialCategories } from '../data/mockCategories';
+import { supabase } from '../supabase';
 
-const STORAGE_KEY = 'cosmatic_admin_categories';
 
-const getStoredCategories = () => {
-  const data = localStorage.getItem(STORAGE_KEY);
-  if (!data) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(initialCategories));
-    return initialCategories;
-  }
-  try {
-    return JSON.parse(data);
-  } catch (e) {
-    return initialCategories;
-  }
+const mapToUI = (dbCategory) => {
+  if (!dbCategory) return null;
+  return {
+    id: dbCategory.id,
+    name: dbCategory.name,
+    slug: dbCategory.slug,
+    parentId: dbCategory.parent_id,
+    created_at: dbCategory.created_at
+  };
 };
 
-const saveStoredCategories = (categories) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(categories));
+const mapToDB = (uiCategory) => {
+  return {
+    name: uiCategory.name,
+    slug: uiCategory.slug || uiCategory.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+    parent_id: uiCategory.parentId || null
+  };
 };
 
 export const categoryService = {
   async getCategories() {
-    await new Promise(resolve => setTimeout(resolve, 150));
-    return getStoredCategories();
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*')
+      .order('name');
+      
+    if (error) {
+      console.error('Error fetching categories:', error);
+      throw error;
+    }
+    return (data || []).map(mapToUI);
   },
 
   async createCategory(categoryData) {
-    await new Promise(resolve => setTimeout(resolve, 200));
-    const categories = getStoredCategories();
-    const slug = categoryData.slug || categoryData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    const newCat = {
-      ...categoryData,
-      id: `cat-${Date.now()}`,
-      slug,
-      parentId: categoryData.parentId || null,
-      status: categoryData.status || 'Active'
-    };
-    const updated = [...categories, newCat];
-    saveStoredCategories(updated);
-    return newCat;
+    const dbData = mapToDB(categoryData);
+    const { data, error } = await supabase
+      .from('categories')
+      .insert([dbData])
+      .select('*')
+      .single();
+      
+    if (error) throw error;
+    return mapToUI(data);
   },
 
   async updateCategory(id, categoryData) {
-    await new Promise(resolve => setTimeout(resolve, 200));
-    const categories = getStoredCategories();
-    const index = categories.findIndex(c => c.id === id || String(c.id) === String(id));
-    if (index === -1) throw new Error('Category not found');
-
-    const updatedCat = {
-      ...categories[index],
-      ...categoryData,
-      slug: categoryData.slug || categoryData.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || categories[index].slug
-    };
-    categories[index] = updatedCat;
-    saveStoredCategories(categories);
-    return updatedCat;
+    const dbData = mapToDB(categoryData);
+    const { data, error } = await supabase
+      .from('categories')
+      .update(dbData)
+      .eq('id', id)
+      .select('*')
+      .single();
+      
+    if (error) throw error;
+    return mapToUI(data);
   },
 
   async deleteCategory(id) {
-    await new Promise(resolve => setTimeout(resolve, 150));
-    const categories = getStoredCategories();
-    const updated = categories.filter(c => c.id !== id && String(c.id) !== String(id));
-    saveStoredCategories(updated);
+    const { error } = await supabase
+      .from('categories')
+      .delete()
+      .eq('id', id);
+      
+    if (error) throw error;
     return true;
   }
 };

@@ -24,7 +24,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems = [], onUpdateQu
             <p className="text-neutral-600 text-sm font-medium mb-6 px-4">
               Looks like you haven't added anything yet. Let's find something you'll love.
             </p>
-            <button 
+            <button
               onClick={onClose}
               className="w-full bg-black text-white font-extrabold text-xs sm:text-sm py-4 rounded-full uppercase tracking-wider hover:bg-neutral-800 transition-colors"
             >
@@ -40,9 +40,9 @@ export default function CartDrawer({ isOpen, onClose, cartItems = [], onUpdateQu
                   <img src={prod.image} alt={prod.title} className="w-full aspect-[3/4] object-contain mix-blend-multiply mb-3 group-hover:scale-105 transition-transform" />
                   <div className="flex space-x-[1px] mb-1.5">
                     {[...Array(5)].map((_, i) => (
-                      <Star 
-                        key={i} 
-                        className={`w-2.5 h-2.5 ${i < Math.floor(prod.rating) ? 'fill-neutral-700 text-neutral-700' : 'fill-neutral-200 text-neutral-200'}`} 
+                      <Star
+                        key={i}
+                        className={`w-2.5 h-2.5 ${i < Math.floor(prod.rating) ? 'fill-neutral-700 text-neutral-700' : 'fill-neutral-200 text-neutral-200'}`}
                       />
                     ))}
                     <span className="text-[10px] text-neutral-500 ml-1">({prod.reviews})</span>
@@ -79,12 +79,12 @@ export default function CartDrawer({ isOpen, onClose, cartItems = [], onUpdateQu
         {/* Free Shipping Progress */}
         <div className="bg-indigo-50 p-4 text-center text-indigo-900 font-extrabold mx-5 mb-4 rounded border border-indigo-100">
           <p className="text-xs tracking-wider mb-2">
-            {progress >= 100 
-              ? "🎉 You've unlocked Free Shipping!" 
+            {progress >= 100
+              ? "🎉 You've unlocked Free Shipping!"
               : `Add $${(freeShippingThreshold - subtotal).toFixed(2)} more for FREE Shipping ($35+)`}
           </p>
           <div className="w-full h-1.5 bg-indigo-200 rounded-full overflow-hidden">
-            <div 
+            <div
               className="h-full bg-indigo-600 rounded-full transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
@@ -95,10 +95,10 @@ export default function CartDrawer({ isOpen, onClose, cartItems = [], onUpdateQu
         <div className="flex-1 overflow-y-auto px-5 space-y-4">
           {cartItems.map((item) => (
             <div key={item.id} className="flex gap-4 py-4 border-b border-neutral-100">
-              <img 
-                src={item.image} 
-                alt={item.title} 
-                className="w-20 h-24 object-contain bg-neutral-50 rounded" 
+              <img
+                src={item.image}
+                alt={item.title}
+                className="w-20 h-24 object-contain bg-neutral-50 rounded"
               />
               <div className="flex-1 flex flex-col justify-between">
                 <div>
@@ -106,7 +106,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems = [], onUpdateQu
                     <h3 className="font-bold text-[13px] text-black leading-snug">
                       {item.title}
                     </h3>
-                    <button 
+                    <button
                       onClick={() => onRemoveItem(item.id)}
                       className="text-neutral-400 hover:text-black transition-colors"
                     >
@@ -120,7 +120,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems = [], onUpdateQu
 
                 <div className="flex justify-between items-center mt-3">
                   <div className="flex items-center border border-black rounded-full overflow-hidden">
-                    <button 
+                    <button
                       onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
                       className="px-3 py-1.5 hover:bg-neutral-100 text-black font-bold"
                     >
@@ -129,14 +129,14 @@ export default function CartDrawer({ isOpen, onClose, cartItems = [], onUpdateQu
                     <span className="w-6 text-center text-xs font-black">
                       {item.quantity}
                     </span>
-                    <button 
+                    <button
                       onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
                       className="px-3 py-1.5 hover:bg-neutral-100 text-black font-bold"
                     >
                       <Plus className="w-3 h-3" />
                     </button>
                   </div>
-                  
+
                   <span className="font-black text-sm text-black">
                     ${(item.price * item.quantity).toFixed(2)}
                   </span>
@@ -155,9 +155,9 @@ export default function CartDrawer({ isOpen, onClose, cartItems = [], onUpdateQu
           <p className="text-[11px] text-neutral-500 font-medium text-center mb-4">
             Taxes and shipping calculated at checkout.
           </p>
-          <Link 
-            to="/checkout" 
-            onClick={onClose} 
+          <Link
+            to="/checkout"
+            onClick={onClose}
             className="w-full flex items-center justify-center py-4 bg-black text-white rounded-full font-extrabold text-sm uppercase tracking-wider hover:bg-neutral-800 transition-colors shadow-lg"
           >
             CHECKOUT
@@ -173,7 +173,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems = [], onUpdateQu
       <div className="bg-[#5c21c0] text-white px-5 py-4 flex items-center justify-between mx-4 rounded-lg">
         <div className="flex items-center gap-3">
           <div className="text-[20px] font-black leading-none italic tracking-tighter">
-            beauty<br/>squad
+            beauty<br />squad
           </div>
           <span className="text-xs font-medium pl-2 border-l border-white/30">
             Redeem exclusive rewards
@@ -187,7 +187,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems = [], onUpdateQu
       <div className="flex flex-col items-center text-center mt-12 px-6">
         <Diamond className="w-10 h-10 text-black mb-6" strokeWidth={1.5} />
         <h3 className="text-3xl font-extrabold text-black leading-[1.1] mb-5">
-          Beauty Squad<br/>Rewards
+          Beauty Squad<br />Rewards
         </h3>
         <p className="text-neutral-800 text-[14px] leading-relaxed mb-8">
           Everything you earn, all in one place. Sign in to see rewards + free shipping on first order.
@@ -262,7 +262,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems = [], onUpdateQu
     <AnimatePresence>
       {isOpen && (
         <>
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -271,7 +271,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems = [], onUpdateQu
             className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50"
           />
 
-          <motion.div 
+          <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
@@ -290,19 +290,19 @@ export default function CartDrawer({ isOpen, onClose, cartItems = [], onUpdateQu
 
             {/* Tab Navigation Pill */}
             <div className="mx-4 mb-6 bg-white rounded-full flex shadow-sm border border-neutral-100 p-1 relative z-10">
-              <button 
+              <button
                 onClick={() => setActiveTab('bag')}
                 className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase transition-colors ${activeTab === 'bag' ? 'bg-black text-white' : 'text-neutral-600 hover:text-black'}`}
               >
                 <ShoppingBag className="w-3.5 h-3.5" /> Bag
               </button>
-              <button 
+              <button
                 onClick={() => setActiveTab('rewards')}
                 className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase transition-colors ${activeTab === 'rewards' ? 'bg-black text-white' : 'text-neutral-600 hover:text-black'}`}
               >
                 <Diamond className="w-3.5 h-3.5" /> Rewards
               </button>
-              <button 
+              <button
                 onClick={() => setActiveTab('offers')}
                 className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase transition-colors ${activeTab === 'offers' ? 'bg-black text-white' : 'text-neutral-600 hover:text-black'}`}
               >

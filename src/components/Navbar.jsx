@@ -20,16 +20,16 @@ export default function Navbar({ onOpenCart, cartCount = 0 }) {
   ];
 
   return (
-    <nav 
+    <nav
       onMouseLeave={() => setActiveMenuType(null)}
       className="bg-black text-white relative z-50 border-b border-neutral-900 font-sans select-none"
     >
       <div className="w-full px-4 sm:px-8 py-2.5 flex items-center justify-between gap-4">
-        
+
         {/* Left Section: Mobile Menu Toggle + Logo + Nav Links */}
         <div className="flex items-center gap-4 xl:gap-6">
           {/* Mobile Hamburger */}
-          <button 
+          <button
             className="xl:hidden p-1.5 text-white hover:text-neutral-300 -ml-1.5"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle menu"
@@ -40,10 +40,10 @@ export default function Navbar({ onOpenCart, cartCount = 0 }) {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link to="/" className="inline-block py-0.5">
-              <img 
-                src={logoImg} 
-                alt="Amaré Logo" 
-                className="h-10 sm:h-12 w-auto object-contain hover:opacity-90 transition-opacity" 
+              <img
+                src={logoImg}
+                alt="Amaré Logo"
+                className="h-10 sm:h-12 w-auto object-contain hover:opacity-90 transition-opacity"
                 style={{ imageRendering: 'crisp-edges' }}
               />
             </Link>
@@ -57,13 +57,12 @@ export default function Navbar({ onOpenCart, cartCount = 0 }) {
                 onMouseEnter={() => setActiveMenuType(link.menuType)}
                 className="relative py-1"
               >
-                <Link 
+                <Link
                   to={link.path}
-                  className={`flex items-center gap-1.5 transition-colors border-b-2 py-0.5 ${
-                    activeMenuType === link.menuType
+                  className={`flex items-center gap-1.5 transition-colors border-b-2 py-0.5 ${activeMenuType === link.menuType
                       ? 'border-white text-white font-extrabold'
                       : 'border-transparent text-white hover:text-neutral-300'
-                  }`}
+                    }`}
                 >
                   <span className="text-xs">{link.icon}</span>
                   <span>{link.label}</span>
@@ -76,8 +75,8 @@ export default function Navbar({ onOpenCart, cartCount = 0 }) {
         {/* Right Utilities */}
         <div className="flex items-center space-x-4 sm:space-x-5 text-xs font-bold">
           {/* Beauty Squad */}
-          <Link 
-            to="/account" 
+          <Link
+            to="/account"
             className="hidden md:flex items-center gap-1.5 hover:text-neutral-300 transition-colors"
           >
             <Users className="w-4 h-4" />
@@ -86,11 +85,11 @@ export default function Navbar({ onOpenCart, cartCount = 0 }) {
 
           {/* Oval Search Input */}
           <div className="relative hidden sm:block w-36 md:w-52">
-            <input 
-              type="text" 
+            <input
+              type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search" 
+              placeholder="Search"
               className="w-full bg-black text-white text-xs pl-8 pr-3 py-1.5 rounded-full border border-neutral-700 focus:outline-none focus:border-white transition-colors"
             />
             <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-neutral-400 w-3.5 h-3.5" />
@@ -98,13 +97,13 @@ export default function Navbar({ onOpenCart, cartCount = 0 }) {
 
           {/* Country Selector */}
           <div className="relative hidden lg:block">
-            <button 
+            <button
               onClick={() => setShowCountryDropdown(!showCountryDropdown)}
               className="flex items-center gap-1 hover:text-neutral-300 transition-colors font-black text-xs tracking-widest uppercase py-1"
             >
               {selectedCountry}
             </button>
-            
+
             {showCountryDropdown && (
               <div className="absolute top-full right-[-10px] mt-4 w-24 bg-white border border-neutral-200 shadow-2xl py-2 z-50 rounded-sm">
                 <div className="absolute -top-2 right-4 w-4 h-4 bg-white border-t border-l border-neutral-200 transform rotate-45"></div>
@@ -133,8 +132,8 @@ export default function Navbar({ onOpenCart, cartCount = 0 }) {
           </Link>
 
           {/* Shopping Bag Button */}
-          <button 
-            onClick={onOpenCart} 
+          <button
+            onClick={onOpenCart}
             className="relative p-1 hover:text-neutral-300 transition-colors flex items-center"
             aria-label="Open cart"
           >
@@ -149,10 +148,10 @@ export default function Navbar({ onOpenCart, cartCount = 0 }) {
       </div>
 
       {/* Mega Menu Hover Dropdown */}
-      <MegaMenu 
-        isOpen={!!activeMenuType} 
+      <MegaMenu
+        isOpen={!!activeMenuType}
         menuType={activeMenuType}
-        onClose={() => setActiveMenuType(null)} 
+        onClose={() => setActiveMenuType(null)}
       />
 
       {/* Mobile Drawer */}
@@ -160,7 +159,7 @@ export default function Navbar({ onOpenCart, cartCount = 0 }) {
         <div className="xl:hidden bg-black border-t border-neutral-900 px-4 py-6 space-y-4">
           <div className="flex flex-col space-y-3 font-bold text-sm">
             {navLinks.map((link) => (
-              <Link 
+              <Link
                 key={link.label}
                 to={link.path}
                 onClick={() => setIsMobileMenuOpen(false)}

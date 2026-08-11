@@ -10,7 +10,7 @@ export function ProductForm() {
   const { id } = useParams();
   const isEdit = Boolean(id && id !== 'new');
   const navigate = useNavigate();
-  const { products, categories, addProduct, updateProduct } = useStore();
+  const { products, categories, addProduct, updateProduct, addCategory } = useStore();
 
   const [formData, setFormData] = useState({
     title: '',
@@ -18,14 +18,16 @@ export function ProductForm() {
     type: 'Physical',
     price: '',
     originalPrice: '',
-    category_slug: categories[0]?.slug || 'makeup',
+    categoryId: '',
     stock_quantity: 10,
     status: 'Active',
     images: [],
-    tieredPricing: []
+    tieredPricing: [],
+    variants: []
   });
 
   const [toastMessage, setToastMessage] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     if (isEdit) {
@@ -37,11 +39,12 @@ export function ProductForm() {
           type: existing.type || 'Physical',
           price: existing.price || '',
           originalPrice: existing.originalPrice || '',
-          category_slug: existing.category_slug || categories[0]?.slug || 'makeup',
+          categoryId: existing.categoryId || '',
           stock_quantity: existing.stock_quantity ?? 0,
           status: existing.status || 'Active',
           images: existing.images || [],
-          tieredPricing: existing.tieredPricing || []
+          tieredPricing: existing.tieredPricing || [],
+          variants: existing.variants || []
         });
       }
     }
@@ -49,36 +52,77 @@ export function ProductForm() {
 
   const [imageUrlInput, setImageUrlInput] = useState('');
 
-  // Compress image before storing (keeps base64 small enough for localStorage)
-  const compressImage = (file) => {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const MAX = 600;
-          let { width, height } = img;
-          if (width > MAX || height > MAX) {
-            if (width > height) { height = Math.round((height * MAX) / width); width = MAX; }
-            else { width = Math.round((width * MAX) / height); height = MAX; }
-          }
-          canvas.width = width;
-          canvas.height = height;
-          canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-          resolve(canvas.toDataURL('image/jpeg', 0.65));
-        };
-        img.src = reader.result;
-      };
-      reader.readAsDataURL(file);
+  // Upload directly to Cloudinary
+  const uploadToCloudinary = async (file) => {
+    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+    const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+    
+    if (!cloudName || !uploadPreset) {
+      throw new Error("Cloudinary VITE_CLOUDINARY_CLOUD_NAME or VITE_CLOUDINARY_UPLOAD_PRESET is missing in .env");
+    }
+
+    const data = new FormData();
+    data.append('file', file);
+    data.append('upload_preset', uploadPreset);
+
+    // If it's a video, we must use resource_type: video or auto
+    const resourceType = file.type.startsWith('video/') ? 'video' : 'image';
+
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`, {
+      method: 'POST',
+      body: data
     });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.error?.message || 'Failed to upload to Cloudinary');
+    }
+
+    const json = await res.json();
+    return json.secure_url;
   };
 
   const handleImageUpload = async (e) => {
     const files = Array.from(e.target.files);
-    for (const file of files) {
-      const compressed = await compressImage(file);
-      setFormData(prev => ({ ...prev, images: [...prev.images, compressed] }));
+    if (!files.length) return;
+    
+    setIsUploading(true);
+    setToastMessage('');
+    
+    try {
+      for (const file of files) {
+        const secureUrl = await uploadToCloudinary(file);
+        setFormData(prev => ({ ...prev, images: [...prev.images, secureUrl] }));
+      }
+    } catch (err) {
+      console.error("Cloudinary upload error:", err);
+      setToastMessage(err.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const [uploadingVariantIndex, setUploadingVariantIndex] = useState(null);
+
+  const handleVariantImageUpload = async (index, e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingVariantIndex(index);
+    setToastMessage('');
+
+    try {
+      const secureUrl = await uploadToCloudinary(file);
+      setFormData(prev => {
+        const updated = [...prev.variants];
+        updated[index] = { ...updated[index], image_url: secureUrl };
+        return { ...prev, variants: updated };
+      });
+    } catch (err) {
+      console.error("Variant Cloudinary upload error:", err);
+      setToastMessage(err.message);
+    } finally {
+      setUploadingVariantIndex(null);
     }
   };
 
@@ -122,6 +166,32 @@ export function ProductForm() {
     }));
   };
 
+  // Variants Builder
+  const addVariantRow = () => {
+    setFormData(prev => ({
+      ...prev,
+      variants: [
+        ...prev.variants,
+        { variant_name: '', color_hex: '', image_url: '', stock_quantity: 10, price_override: '' }
+      ]
+    }));
+  };
+
+  const updateVariantRow = (index, field, value) => {
+    setFormData(prev => {
+      const updated = [...prev.variants];
+      updated[index] = { ...updated[index], [field]: value };
+      return { ...prev, variants: updated };
+    });
+  };
+
+  const removeVariantRow = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      variants: prev.variants.filter((_, i) => i !== index)
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.title || !formData.price) {
@@ -139,17 +209,60 @@ export function ProductForm() {
       originalPrice: formData.originalPrice ? Number(formData.originalPrice) : null,
       stock_quantity: Number(formData.stock_quantity),
       images: resolvedImages,
-      // Explicitly set image (singular) so ProductCard and Product page render correctly
-      image: resolvedImages[0]
+      image: resolvedImages[0],
+      categoryId: formData.categoryId || (categories.length > 0 ? categories[0].id : null)
     };
 
-    if (isEdit) {
-      await updateProduct(id, payload);
+    try {
+      if (isEdit) {
+        await updateProduct(id, payload);
+      } else {
+        await addProduct(payload);
+      }
+      navigate('/admin/products');
+    } catch (err) {
+      console.error('Save Product Error:', err);
+      setToastMessage(err?.message || err?.error_description || (typeof err === 'object' ? JSON.stringify(err) : String(err)) || 'Failed to save product. Check database permissions or try again.');
+    }
+  };
+
+  const [isAddingCategory, setIsAddingCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+
+  const handleCategoryChange = (e) => {
+    if (e.target.value === 'add_new_category') {
+      setIsAddingCategory(true);
     } else {
-      await addProduct(payload);
+      setFormData({ ...formData, categoryId: e.target.value });
+    }
+  };
+
+  const submitNewCategory = async () => {
+    if (!newCategoryName.trim()) {
+       setIsAddingCategory(false);
+       return;
+    }
+    const nameStr = newCategoryName.trim();
+    // Case-insensitive match check
+    const existing = categories.find(c => c.name.toLowerCase() === nameStr.toLowerCase());
+    if (existing) {
+      setFormData({ ...formData, categoryId: existing.id });
+      setIsAddingCategory(false);
+      setNewCategoryName('');
+      return;
     }
 
-    navigate('/admin/products');
+    try {
+      const slug = nameStr.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const created = await addCategory({ name: nameStr, slug });
+      setFormData({ ...formData, categoryId: created.id });
+      setIsAddingCategory(false);
+      setNewCategoryName('');
+      setToastMessage('');
+    } catch (err) {
+      console.error(err);
+      setToastMessage("Failed to create category: " + (err.message || String(err)));
+    }
   };
 
   return (
@@ -251,18 +364,27 @@ export function ProductForm() {
 
           {/* Upload Drop Area */}
           <div className="border-2 border-dashed border-neutral-300 dark:border-slate-700 rounded-2xl p-6 text-center hover:border-neutral-500 transition-colors relative bg-neutral-50/50 dark:bg-slate-800/30">
-            <input
-              type="file"
-              multiple
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            />
-            <Upload className="w-8 h-8 mx-auto text-neutral-400 mb-2" />
-            <p className="text-xs font-bold text-neutral-700 dark:text-slate-300">
-              Drag and drop product images here, or <span className="text-cyan-600 underline">browse files</span>
-            </p>
-            <p className="text-[11px] text-neutral-400 mt-1">PNG, JPG, WebP — auto-compressed for storage</p>
+            {isUploading ? (
+              <div className="py-4 flex flex-col items-center justify-center">
+                <div className="w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mb-2"></div>
+                <p className="text-xs font-bold text-neutral-700 dark:text-slate-300">Uploading to Cloudinary...</p>
+              </div>
+            ) : (
+              <>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*,video/*"
+                  onChange={handleImageUpload}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+                <Upload className="w-8 h-8 mx-auto text-neutral-400 mb-2" />
+                <p className="text-xs font-bold text-neutral-700 dark:text-slate-300">
+                  Drag and drop media here, or <span className="text-cyan-600 underline">browse files</span>
+                </p>
+                <p className="text-[11px] text-neutral-400 mt-1">Images and videos will be securely uploaded to Cloudinary</p>
+              </>
+            )}
           </div>
 
           {/* OR — paste image URL */}
@@ -417,6 +539,125 @@ export function ProductForm() {
           </div>
         </div>
 
+        {/* Product Variants Section */}
+        <div className="bg-white dark:bg-admin-darkCard p-6 rounded-2xl border border-admin-border/60 dark:border-admin-darkBorder/60 shadow-soft space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-bold text-admin-text dark:text-admin-darkText flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-indigo-500" />
+              Product Variants
+            </h2>
+            <button
+              type="button"
+              onClick={addVariantRow}
+              className="px-3 py-1.5 bg-neutral-100 dark:bg-slate-800 text-neutral-900 dark:text-white rounded-lg text-xs font-bold flex items-center gap-1 hover:bg-neutral-200 transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Add Variant
+            </button>
+          </div>
+          <p className="text-[11px] text-neutral-400 -mt-2">Add options like shades, colors, or sizes. Images upload directly to Cloudinary.</p>
+
+          {formData.variants.length === 0 ? (
+            <p className="text-xs text-neutral-400 italic bg-neutral-50 dark:bg-slate-800/50 p-3 rounded-xl text-center">
+              No variants added. This product will be treated as a single item.
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {formData.variants.map((variant, idx) => (
+                <div key={idx} className="flex gap-4 p-4 bg-neutral-50 dark:bg-slate-800/50 rounded-xl border border-neutral-200 dark:border-slate-700">
+                  
+                  {/* Variant Image/Color Preview (Left side) */}
+                  <div className="flex flex-col gap-2 shrink-0 w-16">
+                    <div className="w-16 h-16 rounded-xl border border-neutral-200 dark:border-slate-600 bg-white flex items-center justify-center overflow-hidden relative">
+                      {uploadingVariantIndex === idx ? (
+                        <div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                      ) : variant.image_url ? (
+                        <img src={variant.image_url} alt="Variant" className="w-full h-full object-cover" />
+                      ) : variant.color_hex ? (
+                        <div className="w-full h-full" style={{ backgroundColor: variant.color_hex }}></div>
+                      ) : (
+                        <ImageIcon className="w-6 h-6 text-neutral-300" />
+                      )}
+                      
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleVariantImageUpload(idx, e)}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        title="Upload variant image"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Variant Fields (Right side) */}
+                  <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 relative">
+                    <div className="md:col-span-2">
+                      <span className="text-[10px] uppercase font-bold text-neutral-400 block mb-1">Variant Name *</span>
+                      <input
+                        type="text"
+                        required
+                        value={variant.variant_name}
+                        onChange={(e) => updateVariantRow(idx, 'variant_name', e.target.value)}
+                        placeholder="e.g. Fair, Medium, Blue"
+                        className="w-full px-3 py-1.5 bg-white dark:bg-slate-900 border border-neutral-200 dark:border-slate-700 rounded-lg text-sm font-semibold"
+                      />
+                    </div>
+
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-neutral-400 block mb-1">Color Hex</span>
+                      <div className="flex gap-1">
+                        <input
+                          type="color"
+                          value={variant.color_hex || '#000000'}
+                          onChange={(e) => updateVariantRow(idx, 'color_hex', e.target.value)}
+                          className="w-8 h-8 rounded border-none cursor-pointer p-0"
+                        />
+                        <input
+                          type="text"
+                          value={variant.color_hex}
+                          onChange={(e) => updateVariantRow(idx, 'color_hex', e.target.value)}
+                          placeholder="#000000"
+                          className="w-full px-2 py-1.5 bg-white dark:bg-slate-900 border border-neutral-200 dark:border-slate-700 rounded-lg text-xs"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-neutral-400 block mb-1">Stock</span>
+                      <input
+                        type="number"
+                        value={variant.stock_quantity}
+                        onChange={(e) => updateVariantRow(idx, 'stock_quantity', e.target.value)}
+                        className="w-full px-3 py-1.5 bg-white dark:bg-slate-900 border border-neutral-200 dark:border-slate-700 rounded-lg text-sm"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <span className="text-[10px] uppercase font-bold text-neutral-400 block mb-1">Price Override (Optional)</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={variant.price_override || ''}
+                        onChange={(e) => updateVariantRow(idx, 'price_override', e.target.value)}
+                        placeholder="Leave blank for default price"
+                        className="w-full px-3 py-1.5 bg-white dark:bg-slate-900 border border-neutral-200 dark:border-slate-700 rounded-lg text-sm"
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => removeVariantRow(idx)}
+                    className="text-red-400 hover:text-red-600 p-2 shrink-0 self-start"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* Category, Inventory & Status */}
         <div className="bg-white dark:bg-admin-darkCard p-6 rounded-2xl border border-admin-border/60 dark:border-admin-darkBorder/60 shadow-soft space-y-4">
           <h2 className="text-base font-bold text-admin-text dark:text-admin-darkText">
@@ -428,15 +669,41 @@ export function ProductForm() {
               <label className="block text-xs font-bold uppercase tracking-wider text-admin-muted mb-1">
                 Category *
               </label>
-              <select
-                value={formData.category_slug}
-                onChange={(e) => setFormData({ ...formData, category_slug: e.target.value })}
-                className="w-full px-4 py-2.5 bg-admin-bg dark:bg-slate-800 border border-admin-border dark:border-admin-darkBorder rounded-xl text-sm font-semibold outline-none text-admin-text dark:text-admin-darkText capitalize"
-              >
-                {categories.map(c => (
-                  <option key={c.id} value={c.slug}>{c.name}</option>
-                ))}
-              </select>
+              {!isAddingCategory ? (
+                <select
+                  value={formData.categoryId || (categories.length > 0 ? categories[0].id : '')}
+                  onChange={handleCategoryChange}
+                  className="w-full px-4 py-2.5 bg-admin-bg dark:bg-slate-800 border border-admin-border dark:border-admin-darkBorder rounded-xl text-sm font-semibold outline-none text-admin-text dark:text-admin-darkText capitalize"
+                >
+                  {categories.map(c => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                  <option value="add_new_category" className="font-bold text-cyan-600 bg-neutral-100 dark:bg-slate-700">
+                    + Add new category
+                  </option>
+                </select>
+              ) : (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    autoFocus
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                    placeholder="New category..."
+                    className="flex-1 px-3 py-2 bg-admin-bg dark:bg-slate-800 border border-admin-border dark:border-admin-darkBorder rounded-xl text-sm font-semibold outline-none focus:ring-2 focus:ring-cyan-500 text-admin-text dark:text-admin-darkText"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') { e.preventDefault(); submitNewCategory(); }
+                      if (e.key === 'Escape') { setIsAddingCategory(false); setNewCategoryName(''); }
+                    }}
+                  />
+                  <button type="button" onClick={submitNewCategory} className="px-3 py-2 bg-cyan-600 text-white rounded-xl text-sm font-bold hover:bg-cyan-700 transition-colors">
+                    Add
+                  </button>
+                  <button type="button" onClick={() => {setIsAddingCategory(false); setNewCategoryName('');}} className="px-3 py-2 bg-neutral-200 dark:bg-slate-700 text-neutral-700 dark:text-slate-300 rounded-xl text-sm font-bold hover:bg-neutral-300 dark:hover:bg-slate-600 transition-colors">
+                    Cancel
+                  </button>
+                </div>
+              )}
             </div>
 
             <div>

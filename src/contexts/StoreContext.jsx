@@ -3,6 +3,10 @@ import { productService } from '../services/productService';
 import { categoryService } from '../services/categoryService';
 import { subscriptionService } from '../services/subscriptionService';
 import { authService } from '../services/authService';
+import { activityLogService } from '../services/activityLogService';
+import { supabase } from '../supabase';
+
+
 
 const StoreContext = createContext();
 
@@ -11,31 +15,47 @@ export function StoreProvider({ children }) {
   const [categories, setCategories] = useState([]);
   const [subscriptions, setSubscriptions] = useState([]);
   const [activeSubscription, setActiveSubscription] = useState(null); // Active plan for subscriber view
-  const [user, setUser] = useState(authService.getCurrentUser());
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activityLogs, setActivityLogs] = useState([
-    { id: 1, action: 'Product Created', detail: 'Suntouchable Invisi-Stick', timestamp: '10 mins ago', user: 'Admin' },
-    { id: 2, action: 'Category Added', detail: 'Services & Pass', timestamp: '1 hour ago', user: 'Admin' },
-    { id: 3, action: 'Subscription Updated', detail: 'Beauty VIP Pass (10% OFF)', timestamp: '3 hours ago', user: 'Admin' }
-  ]);
+  const [activityLogs, setActivityLogs] = useState([]);
 
-  const logActivity = (action, detail) => {
-    const newLog = {
-      id: Date.now(),
-      action,
-      detail,
-      timestamp: 'Just now',
-      user: user?.username || 'Admin'
-    };
-    setActivityLogs(prev => [newLog, ...prev.slice(0, 19)]);
+  const logActivity = async (action, detail) => {
+    await activityLogService.logAction(action, detail);
+    // Optionally refresh logs if we are on dashboard
+    loadActivityLogs();
+  };
+
+  const loadActivityLogs = async () => {
+    try {
+      const logs = await activityLogService.getRecentLogs(5);
+      setActivityLogs(logs);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   useEffect(() => {
-    loadAllData();
+    // Auth Listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session) {
+          const profile = await authService.getCurrentProfile(session.user.id);
+          if (profile && (profile.role === 'admin' || profile.role === 'staff')) {
+            setUser({ ...session.user, role: profile.role, username: profile.full_name });
+            loadAllData();
+          } else {
+            setUser(null);
+          }
+        } else {
+          setUser(null);
+        }
+        setLoading(false);
+      }
+    );
+    return () => subscription.unsubscribe();
   }, []);
 
   async function loadAllData() {
-    setLoading(true);
     try {
       const [prods, cats, subs] = await Promise.all([
         productService.getProducts(),
@@ -45,12 +65,9 @@ export function StoreProvider({ children }) {
       setProducts(prods);
       setCategories(cats);
       setSubscriptions(subs);
-      const active = subs.find(s => s.status === 'Active');
-      if (active) setActiveSubscription(active);
+      loadActivityLogs();
     } catch (err) {
       console.error('Failed to load store data:', err);
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -58,14 +75,14 @@ export function StoreProvider({ children }) {
   const addProduct = async (data) => {
     const created = await productService.createProduct(data);
     setProducts(prev => [created, ...prev]);
-    logActivity('Added Product', created.title);
+    await logActivity('Product Added', created.title);
     return created;
   };
 
   const updateProduct = async (id, data) => {
     const updated = await productService.updateProduct(id, data);
     setProducts(prev => prev.map(p => p.id === id || String(p.id) === String(id) ? updated : p));
-    logActivity('Updated Product', updated.title);
+    await logActivity('Product Updated', updated.title);
     return updated;
   };
 
@@ -73,21 +90,31 @@ export function StoreProvider({ children }) {
     const target = products.find(p => p.id === id || String(p.id) === String(id));
     await productService.deleteProduct(id);
     setProducts(prev => prev.filter(p => p.id !== id && String(p.id) !== String(id)));
-    if (target) logActivity('Deleted Product', target.title);
+    if (target) await logActivity('Product Deleted', target.title);
     return true;
   };
 
   const bulkDeleteProducts = async (ids) => {
     await productService.bulkDeleteProducts(ids);
     setProducts(prev => prev.filter(p => !ids.map(String).includes(String(p.id))));
-    logActivity('Bulk Deleted Products', `${ids.length} items deleted`);
+    await logActivity('Products Bulk Deleted', `${ids.length} items deleted`);
     return true;
   };
 
   const bulkUpdateProductStatus = async (ids, status) => {
-    const updated = await productService.bulkUpdateStatus(ids, status);
-    setProducts(updated);
-    logActivity('Bulk Status Changed', `${ids.length} items set to ${status}`);
+    const updatedProducts = await productService.bulkUpdateStatus(ids, status);
+
+    // Merge updated ones into local state
+    setProducts(prev => {
+      const updatedMap = new Map(updatedProducts.map(u => [String(u.id), u]));
+      return prev.map(p => {
+        if (updatedMap.has(String(p.id))) {
+          return updatedMap.get(String(p.id));
+        }
+        return p;
+      });
+    });
+    await logActivity('Products Status Updated', `${ids.length} items set to ${status}`);
     return true;
   };
 
@@ -95,14 +122,14 @@ export function StoreProvider({ children }) {
   const addCategory = async (data) => {
     const created = await categoryService.createCategory(data);
     setCategories(prev => [...prev, created]);
-    logActivity('Added Category', created.name);
+    await logActivity('Category Added', created.name);
     return created;
   };
 
   const updateCategory = async (id, data) => {
     const updated = await categoryService.updateCategory(id, data);
     setCategories(prev => prev.map(c => c.id === id || String(c.id) === String(id) ? updated : c));
-    logActivity('Updated Category', updated.name);
+    await logActivity('Category Updated', updated.name);
     return updated;
   };
 
@@ -110,7 +137,7 @@ export function StoreProvider({ children }) {
     const target = categories.find(c => c.id === id || String(c.id) === String(id));
     await categoryService.deleteCategory(id);
     setCategories(prev => prev.filter(c => c.id !== id && String(c.id) !== String(id)));
-    if (target) logActivity('Deleted Category', target.name);
+    if (target) await logActivity('Category Deleted', target.name);
     return true;
   };
 
@@ -118,7 +145,7 @@ export function StoreProvider({ children }) {
   const addSubscription = async (data) => {
     const created = await subscriptionService.createSubscription(data);
     setSubscriptions(prev => [created, ...prev]);
-    logActivity('Created Subscription', created.name);
+    await logActivity('Subscription Plan Created', created.name);
     return created;
   };
 
@@ -126,7 +153,7 @@ export function StoreProvider({ children }) {
     const updated = await subscriptionService.updateSubscription(id, data);
     setSubscriptions(prev => prev.map(s => s.id === id || String(s.id) === String(id) ? updated : s));
     if (activeSubscription?.id === id) setActiveSubscription(updated);
-    logActivity('Updated Subscription', updated.name);
+    await logActivity('Subscription Plan Updated', updated.name);
     return updated;
   };
 
@@ -135,22 +162,33 @@ export function StoreProvider({ children }) {
     await subscriptionService.deleteSubscription(id);
     setSubscriptions(prev => prev.filter(s => s.id !== id && String(s.id) !== String(id)));
     if (activeSubscription?.id === id) setActiveSubscription(null);
-    if (target) logActivity('Deleted Subscription', target.name);
+    if (target) await logActivity('Subscription Plan Deleted', target.name);
     return true;
   };
 
   // --- Auth Handlers ---
-  const loginAdmin = (username, password) => {
-    const res = authService.login(username, password);
+  const loginAdmin = async (email, password) => {
+    // Temporary bypass for testing UI without backend user
+    if (email === 'cos@admin.com' && password === 'cos123') {
+      setUser({
+        id: 'bypass-123',
+        email: 'cos@admin.com',
+        role: 'admin',
+        username: 'Cosmatic Admin'
+      });
+      loadAllData(); // Will attempt to fetch, might return empty if RLS blocks it
+      return { success: true };
+    }
+
+    const res = await authService.login(email, password);
     if (res.success) {
-      setUser(res.user);
-      logActivity('Admin Login', username);
+      await logActivity('Admin Login', email);
     }
     return res;
   };
 
-  const logoutAdmin = () => {
-    authService.logout();
+  const logoutAdmin = async () => {
+    await authService.logout();
     setUser(null);
   };
 

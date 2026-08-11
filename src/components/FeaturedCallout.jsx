@@ -26,11 +26,11 @@ const MiniProductCard = ({ product, onAddToCart }) => {
     <div className="flex gap-3 items-center w-full bg-neutral-50 rounded-xl p-3 border border-neutral-200/80 hover:border-neutral-300 transition-all">
       {/* Mini Image */}
       <Link to={`/product/${product.id}`} className="shrink-0 w-[64px] h-[64px] bg-white rounded-lg p-1 border border-neutral-100 flex items-center justify-center overflow-hidden">
-        <img 
-          src={product.image || (product.images && product.images[0]) || ''} 
-          alt={product.title} 
+        <img
+          src={product.image || (product.images && product.images[0]) || ''}
+          alt={product.title}
           loading="lazy"
-          className="w-full h-full object-cover rounded-md group-hover:scale-105 transition-transform" 
+          className="w-full h-full object-cover rounded-md group-hover:scale-105 transition-transform"
         />
       </Link>
 
@@ -40,9 +40,9 @@ const MiniProductCard = ({ product, onAddToCart }) => {
         <div className="flex items-center gap-1 mb-0.5">
           <div className="flex text-amber-400 space-x-[1px]">
             {[...Array(5)].map((_, i) => (
-              <Star 
-                key={i} 
-                className={`w-3 h-3 ${i < Math.floor(product.rating || 5) ? 'fill-amber-400 text-amber-400' : 'fill-neutral-200 text-neutral-200'}`} 
+              <Star
+                key={i}
+                className={`w-3 h-3 ${i < Math.floor(product.rating || 5) ? 'fill-amber-400 text-amber-400' : 'fill-neutral-200 text-neutral-200'}`}
               />
             ))}
           </div>
@@ -62,13 +62,12 @@ const MiniProductCard = ({ product, onAddToCart }) => {
             ${product.price}
           </span>
 
-          <button 
+          <button
             onClick={handleAdd}
-            className={`font-black text-[10px] py-1.5 px-3 rounded-full uppercase tracking-wider transition-all duration-200 flex items-center gap-1 ${
-              added 
-                ? 'bg-emerald-600 text-white' 
+            className={`font-black text-[10px] py-1.5 px-3 rounded-full uppercase tracking-wider transition-all duration-200 flex items-center gap-1 ${added
+                ? 'bg-emerald-600 text-white'
                 : 'bg-black text-white hover:bg-neutral-800'
-            }`}
+              }`}
           >
             {added ? (
               <>
@@ -113,12 +112,12 @@ export default function FeaturedCallout({ onAddToCart }) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
         {featuredCallouts.map((item, idx) => (
           <div key={idx} className="bg-white rounded-2xl border border-neutral-200 p-4 sm:p-5 flex flex-col justify-between hover:shadow-xl hover:border-neutral-300 transition-all duration-300 group">
-            
+
             {/* Step Image */}
             <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden mb-4 bg-neutral-100 p-4 group/img">
-              <img 
-                src={stepImages[idx] || item.product.image || (item.product.images && item.product.images[0]) || ''} 
-                alt={item.heading} 
+              <img
+                src={stepImages[idx] || item.product.image || (item.product.images && item.product.images[0]) || ''}
+                alt={item.heading}
                 loading="lazy"
                 className="w-full h-full object-contain group-hover/img:scale-105 transition-transform duration-500"
               />
@@ -138,11 +137,11 @@ export default function FeaturedCallout({ onAddToCart }) {
             </div>
 
             {/* Mini Product Card Component */}
-            <MiniProductCard 
-              product={item.product} 
-              onAddToCart={onAddToCart} 
+            <MiniProductCard
+              product={item.product}
+              onAddToCart={onAddToCart}
             />
-            
+
           </div>
         ))}
       </div>

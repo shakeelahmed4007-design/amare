@@ -54,10 +54,15 @@ export default function CategoryGrid() {
         onMouseMove={handleMouseMove}
         className={`flex gap-4 sm:gap-6 overflow-x-auto no-scrollbar pb-4 ${isDown ? 'cursor-grabbing' : 'cursor-grab'} select-none`}
       >
-        {categories.map((cat) => (
+        {[
+          { title: "Face", slug: "face", image: categories.find(c => c.slug === 'face')?.image || categories[0].image },
+          { title: "Lips", slug: "lips", image: categories.find(c => c.slug === 'lips')?.image || categories[1].image },
+          { title: "Brushes", slug: "brushes", image: categories.find(c => c.slug === 'brushes')?.image || categories[2].image },
+          { title: "Nails", slug: "nails", image: categories.find(c => c.slug === 'nails')?.image || categories[3].image }
+        ].map((cat) => (
           <Link 
-            key={cat.slug || cat.title} 
-            to={`/shop?cat=${cat.slug || cat.title}`}
+            key={cat.slug} 
+            to={`/shop?cat=${cat.slug}`}
             onClick={handleClick}
             draggable="false"
             // Exactly matching the original grid widths: 50% on mobile, 25% on desktop

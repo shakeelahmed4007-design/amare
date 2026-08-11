@@ -15,6 +15,8 @@ import CartPage from './pages/CartPage';
 import Checkout from './pages/Checkout';
 import Login from './pages/Login';
 import Account from './pages/Account';
+import OrderConfirmation from './pages/OrderConfirmation';
+import ScrollToTop from './components/ScrollToTop';
 
 import { AdminLayout } from './components/layout/AdminLayout';
 import AdminLogin from './pages/admin/AdminLogin';
@@ -32,7 +34,12 @@ import { Analytics } from './pages/admin/Analytics';
 import { Settings } from './pages/admin/Settings';
 
 function AdminRouteGuard({ children }) {
-  const { user } = useStore();
+  const { user, loading } = useStore();
+  
+  if (loading) {
+    return <div className="min-h-screen bg-slate-900 flex items-center justify-center text-cyan-400">Loading...</div>;
+  }
+  
   if (!user) {
     return <Navigate to="/admin/login" replace />;
   }
@@ -91,6 +98,7 @@ function MainApp() {
 
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
         {/* ── Admin Routes (no storefront chrome) ── */}
         <Route path="/admin/login" element={<AdminLogin />} />
@@ -134,6 +142,7 @@ function MainApp() {
                 <Route path="/product/:id" element={<Product onAddToCart={handleAddToCart} />} />
                 <Route path="/cart" element={<CartPage cartItems={cartItems} onUpdateQuantity={handleUpdateQuantity} onRemoveItem={handleRemoveItem} />} />
                 <Route path="/checkout" element={<Checkout cartItems={cartItems} />} />
+                <Route path="/order-confirmation" element={<OrderConfirmation />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/account" element={<Account />} />
               </Routes>

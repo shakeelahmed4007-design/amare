@@ -306,6 +306,24 @@ export function Products() {
                             <div>
                               <div className="font-extrabold text-neutral-900 dark:text-slate-100">{product.title}</div>
                               <div className="text-[11px] text-neutral-400 line-clamp-1 max-w-[220px]">{product.description}</div>
+                              {product.variants && product.variants.length > 0 && (
+                                <div className="mt-1.5 flex items-center gap-1 flex-wrap max-w-[220px]">
+                                  {product.variants.map((v, i) => (
+                                    <div 
+                                      key={i}
+                                      className="w-4 h-4 rounded-full border border-neutral-300 dark:border-slate-600 overflow-hidden flex items-center justify-center bg-neutral-100"
+                                      title={v.variant_name}
+                                    >
+                                      {v.image_url ? (
+                                        <img src={v.image_url} alt={v.variant_name} className="w-full h-full object-cover" />
+                                      ) : v.color_hex ? (
+                                        <div className="w-full h-full" style={{ backgroundColor: v.color_hex }} />
+                                      ) : null}
+                                    </div>
+                                  ))}
+                                  <span className="text-[10px] text-neutral-400 ml-1 font-bold">({product.variants.length})</span>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </td>
@@ -315,7 +333,7 @@ export function Products() {
                           </span>
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-xs font-semibold text-neutral-500">
-                          <span className="capitalize">{product.category_slug || 'Uncategorized'}</span>
+                          <span className="capitalize">{product.categoryName || 'Uncategorized'}</span>
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-xs font-black text-neutral-900 dark:text-slate-100">
                           ${product.price}
@@ -391,7 +409,26 @@ export function Products() {
                         </div>
                         <div>
                           <h4 className="font-extrabold text-sm text-neutral-900 dark:text-white">{product.title}</h4>
-                          <span className="text-[11px] text-neutral-400 capitalize">{product.category_slug}</span>
+                          <span className="text-[11px] text-neutral-400 capitalize">{product.categoryName || 'Uncategorized'}</span>
+                          {product.variants && product.variants.length > 0 && (
+                            <div className="mt-1 flex items-center gap-1 flex-wrap">
+                              {product.variants.slice(0, 5).map((v, i) => (
+                                <div 
+                                  key={i}
+                                  className="w-3.5 h-3.5 rounded-full border border-neutral-300 dark:border-slate-600 overflow-hidden"
+                                >
+                                  {v.image_url ? (
+                                    <img src={v.image_url} alt={v.variant_name} className="w-full h-full object-cover" />
+                                  ) : v.color_hex ? (
+                                    <div className="w-full h-full" style={{ backgroundColor: v.color_hex }} />
+                                  ) : null}
+                                </div>
+                              ))}
+                              {product.variants.length > 5 && (
+                                <span className="text-[10px] text-neutral-400 ml-1">+{product.variants.length - 5}</span>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
 

@@ -1,197 +1,180 @@
-import { initialProducts } from '../data/mockProducts';
+import { supabase } from '../supabase';
 
-const STORAGE_KEY = 'cosmatic_admin_products';
-// Bump this version whenever the storage schema changes.
-// On mismatch the stored data is migrated instead of wiped.
-const STORAGE_VERSION = 5;
-const VERSION_KEY = 'cosmatic_products_version';
-
-const sanitizeProduct = (p) => {
-  let title = p.title || '';
-  let description = p.description || '';
-  let details = p.details || '';
-  
-  // Specific fix for user requested product
-  if (title.includes('Alpecin Grey Attack')) {
-    const extraInfo = title.replace('Alpecin Grey Attack Shampoo', '').replace('Alpecin', 'Alpecin'); // just grab original
-    title = 'Alpecin Grey Attack Shampoo';
-    if (details) {
-      details = `${details}\n\nAdditional Info: ${p.title}`;
-    } else {
-      description = description ? `${description}\n\nAdditional Info: ${p.title}` : p.title;
-    }
-  } else {
-    const words = title.trim().split(/\s+/);
-    if (words.length > 5) {
-      let newTitle = words.slice(0, 5).join(' ');
-      const extraInfo = words.slice(5).join(' ');
-      
-      // Clean trailing punctuation and commas
-      newTitle = newTitle.replace(/[,|:-]+$/, '').trim().replace(/,/g, '');
-      title = newTitle;
-      
-      if (details) {
-        details = `${details}\n\nAdditional Info: ${extraInfo}`;
-      } else {
-        description = description ? `${description}\n\nAdditional Info: ${extraInfo}` : extraInfo;
-      }
-    }
-  }
-  
-  return { ...p, title, description, details };
-};
-
-/**
- * Migrate a single product so it always has both `image` (singular)
- * and `images` (array) in sync, which is what ProductCard / Product page need.
- */
-const migrateProduct = (p) => {
-  const imgs = Array.isArray(p.images) && p.images.length > 0
-    ? p.images
-    : p.image
-      ? [p.image]
-      : ['https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=800'];
-      
-  const sanitized = sanitizeProduct(p);
-
+const mapToUI = (dbProduct) => {
+  if (!dbProduct) return null;
   return {
-    ...sanitized,
-    images: imgs,
-    image: imgs[0],
-    status: p.status || 'Active',
-    tieredPricing: p.tieredPricing || [],
-    rating: p.rating || 5.0,
-    reviews: p.reviews ?? 0,
+    id: dbProduct.id,
+    title: dbProduct.name,
+    slug: dbProduct.slug,
+    description: dbProduct.description,
+    price: Number(dbProduct.price),
+    stock_quantity: dbProduct.stock_quantity,
+    categoryId: dbProduct.category_id,
+    categoryName: dbProduct.categories?.name,
+    category_slug: dbProduct.categories?.slug,
+    image: dbProduct.image_url,
+    images: dbProduct.image_url ? [dbProduct.image_url] : [],
+    status: dbProduct.status === 'active' ? 'Active' : 'Inactive',
+    variants: dbProduct.product_variants || [],
+    created_at: dbProduct.created_at,
+    updated_at: dbProduct.updated_at
   };
 };
 
-const getStoredProducts = () => {
-  const storedVersion = Number(localStorage.getItem(VERSION_KEY) || 0);
-  const data = localStorage.getItem(STORAGE_KEY);
-
-  // No data at all → seed with initial products
-  if (!data) {
-    const seeded = initialProducts.map(migrateProduct);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
-    localStorage.setItem(VERSION_KEY, String(STORAGE_VERSION));
-    return seeded;
-  }
-
-  let parsed;
-  try {
-    parsed = JSON.parse(data);
-  } catch {
-    // Completely corrupt JSON → re-seed
-    const seeded = initialProducts.map(migrateProduct);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
-    localStorage.setItem(VERSION_KEY, String(STORAGE_VERSION));
-    return seeded;
-  }
-
-  if (!Array.isArray(parsed)) {
-    const seeded = initialProducts.map(migrateProduct);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
-    localStorage.setItem(VERSION_KEY, String(STORAGE_VERSION));
-    return seeded;
-  }
-
-  // Version mismatch → migrate existing products in-place (preserves user data)
-  if (storedVersion < STORAGE_VERSION) {
-    const migrated = parsed.map(migrateProduct);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
-    localStorage.setItem(VERSION_KEY, String(STORAGE_VERSION));
-    return migrated;
-  }
-
-  return parsed;
-};
-
-const saveStoredProducts = (products) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
-  localStorage.setItem(VERSION_KEY, String(STORAGE_VERSION));
+const mapToDB = (uiProduct) => {
+  const dbStatus = uiProduct.status === 'Active' ? 'active' : 'inactive';
+  const imageUrl = Array.isArray(uiProduct.images) && uiProduct.images.length > 0 
+    ? uiProduct.images[0] 
+    : (uiProduct.image || null);
+    
+  return {
+    name: uiProduct.title,
+    slug: uiProduct.slug || uiProduct.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+    description: uiProduct.description,
+    price: uiProduct.price,
+    stock_quantity: uiProduct.stock_quantity || 0,
+    category_id: uiProduct.categoryId || null,
+    image_url: imageUrl,
+    status: dbStatus
+  };
 };
 
 export const productService = {
-  // Simulate fetching products list with optional delay
   async getProducts() {
-    await new Promise(resolve => setTimeout(resolve, 150));
-    return getStoredProducts();
+    const { data, error } = await supabase
+      .from('products')
+      .select('*, categories(name, slug), product_variants(*)')
+      .order('created_at', { ascending: false });
+      
+    if (error) throw error;
+    return (data || []).map(mapToUI);
   },
 
   async getProductById(id) {
-    await new Promise(resolve => setTimeout(resolve, 100));
-    const products = getStoredProducts();
-    return products.find(p => p.id === id || String(p.id) === String(id)) || null;
+    const { data, error } = await supabase
+      .from('products')
+      .select('*, categories(name, slug), product_variants(*)')
+      .eq('id', id)
+      .order('sort_order', { referencedTable: 'product_variants', ascending: true })
+      .single();
+      
+    if (error) {
+      if (error.code === 'PGRST116') return null; // Not found
+      throw error;
+    }
+    return mapToUI(data);
   },
 
   async createProduct(productData) {
-    await new Promise(resolve => setTimeout(resolve, 200));
-    const products = getStoredProducts();
-    const firstImage = productData.images?.[0] || productData.image || '';
+    const dbData = mapToDB(productData);
+    const { data: createdProduct, error } = await supabase
+      .from('products')
+      .insert([dbData])
+      .select('id')
+      .single();
+      
+    if (error) throw error;
     
-    const sanitizedData = sanitizeProduct(productData);
+    // Handle variants
+    if (productData.variants && productData.variants.length > 0) {
+      const variantsToInsert = productData.variants.map((v, index) => ({
+        product_id: createdProduct.id,
+        variant_name: v.variant_name,
+        color_hex: v.color_hex || null,
+        image_url: v.image_url || null,
+        stock_quantity: Number(v.stock_quantity) || 0,
+        price_override: v.price_override ? Number(v.price_override) : null,
+        sort_order: index
+      }));
+      
+      const { error: variantError } = await supabase
+        .from('product_variants')
+        .insert(variantsToInsert);
+        
+      if (variantError) throw variantError;
+    }
     
-    const newProduct = {
-      ...sanitizedData,
-      id: `prod-${Date.now()}`,
-      // Keep both `image` (singular) and `images` (array) in sync
-      // ProductCard and Product page both rely on product.image
-      image: firstImage,
-      images: sanitizedData.images?.length > 0 ? sanitizedData.images : (firstImage ? [firstImage] : []),
-      rating: sanitizedData.rating || 5.0,
-      reviews: sanitizedData.reviews ?? 0,
-      status: sanitizedData.status || 'Active',
-      tieredPricing: sanitizedData.tieredPricing || [],
-    };
-
-    const updated = [newProduct, ...products];
-    saveStoredProducts(updated);
-    return newProduct;
+    return this.getProductById(createdProduct.id);
   },
 
   async updateProduct(id, productData) {
-    await new Promise(resolve => setTimeout(resolve, 200));
-    const products = getStoredProducts();
-    const sanitizedData = sanitizeProduct(productData);
+    const dbData = mapToDB(productData);
+    dbData.updated_at = new Date().toISOString();
     
-    let updatedProduct = null;
-    const updated = products.map(p => {
-      if (p.id === id || String(p.id) === String(id)) {
-        updatedProduct = { ...p, ...sanitizedData };
-        return updatedProduct;
+    const { error } = await supabase
+      .from('products')
+      .update(dbData)
+      .eq('id', id);
+      
+    if (error) throw error;
+    
+    // Handle variants
+    if (productData.variants) {
+      const { error: deleteError } = await supabase
+        .from('product_variants')
+        .delete()
+        .eq('product_id', id);
+        
+      if (deleteError) throw deleteError;
+      
+      if (productData.variants.length > 0) {
+        const variantsToInsert = productData.variants.map((v, index) => ({
+          product_id: id,
+          variant_name: v.variant_name,
+          color_hex: v.color_hex || null,
+          image_url: v.image_url || null,
+          stock_quantity: Number(v.stock_quantity) || 0,
+          price_override: v.price_override ? Number(v.price_override) : null,
+          sort_order: index
+        }));
+        
+        const { error: insertError } = await supabase
+          .from('product_variants')
+          .insert(variantsToInsert);
+          
+        if (insertError) throw insertError;
       }
-      return p;
-    });
-    
-    if (updatedProduct) {
-      saveStoredProducts(updated);
     }
-    return updatedProduct;
+    
+    return this.getProductById(id);
   },
 
   async deleteProduct(id) {
-    await new Promise(resolve => setTimeout(resolve, 150));
-    const products = getStoredProducts();
-    const updated = products.filter(p => p.id !== id && String(p.id) !== String(id));
-    saveStoredProducts(updated);
+    const { error } = await supabase
+      .from('products')
+      .delete()
+      .eq('id', id);
+      
+    if (error) throw error;
     return true;
   },
 
   async bulkDeleteProducts(ids) {
-    await new Promise(resolve => setTimeout(resolve, 200));
-    const products = getStoredProducts();
-    const idSet = new Set(ids.map(String));
-    const updated = products.filter(p => !idSet.has(String(p.id)));
-    saveStoredProducts(updated);
+    const { error } = await supabase
+      .from('products')
+      .delete()
+      .in('id', ids);
+      
+    if (error) throw error;
     return true;
   },
 
   async bulkUpdateStatus(ids, newStatus) {
-    await new Promise(resolve => setTimeout(resolve, 200));
-    const products = getStoredProducts();
-    const idSet = new Set(ids.map(String));
-    const updated = products.map(p => idSet.has(String(p.id)) ? { ...p, status: newStatus } : p);
-    saveStoredProducts(updated);
-    return updated;
+    const dbStatus = newStatus === 'Active' ? 'active' : 'inactive';
+    const { error } = await supabase
+      .from('products')
+      .update({ status: dbStatus, updated_at: new Date().toISOString() })
+      .in('id', ids);
+      
+    if (error) throw error;
+    
+    // We need to return the updated products for the UI
+    const { data: updatedData, error: fetchError } = await supabase
+      .from('products')
+      .select('*, categories(name, slug), product_variants(*)')
+      .in('id', ids);
+      
+    if (fetchError) throw fetchError;
+    return updatedData.map(mapToUI);
   }
 };
