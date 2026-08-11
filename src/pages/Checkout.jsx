@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronRight, ShieldCheck, ChevronDown, Check } from 'lucide-react';
+import { ChevronRight, ShieldCheck, ChevronDown, Check, Upload, AlertCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import StripeCheckout from '../components/StripeCheckout';
 import PayPalPaymentForm from '../components/PayPalPaymentForm';
@@ -7,10 +7,88 @@ import PayPalPaymentForm from '../components/PayPalPaymentForm';
 export default function Checkout({ cartItems = [] }) {
   const navigate = useNavigate();
   const [step, setStep] = useState(1); // 1: Shipping, 2: Payment
+  const [selectedPayment, setSelectedPayment] = useState('card');
+  const [paymentProofUrl, setPaymentProofUrl] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
   
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const shipping = subtotal > 35 ? 0 : 5.95;
   const total = subtotal + shipping;
+
+  const uploadToCloudinary = async (file) => {
+    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+    const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+    
+    if (!cloudName || !uploadPreset) {
+      throw new Error("Cloudinary VITE_CLOUDINARY_CLOUD_NAME or VITE_CLOUDINARY_UPLOAD_PRESET is missing in .env");
+    }
+
+    const data = new FormData();
+    data.append('file', file);
+    data.append('upload_preset', uploadPreset);
+
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+      method: 'POST',
+      body: data
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.error?.message || 'Failed to upload to Cloudinary');
+    }
+
+    const json = await res.json();
+    return json.secure_url;
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setIsUploading(true);
+    setUploadError('');
+    
+    try {
+      const url = await uploadToCloudinary(file);
+      setPaymentProofUrl(url);
+    } catch (err) {
+      setUploadError(err.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleManualPaymentSubmit = async (e) => {
+    e.preventDefault();
+    if (!paymentProofUrl) {
+      setUploadError('Please upload a payment screenshot before placing your order.');
+      return;
+    }
+
+    try {
+      const { orderService } = await import('../services/orderService');
+      const methodMap = {
+        bank_transfer: 'Bank Transfer',
+        easypaisa: 'EasyPaisa',
+        jazzcash: 'JazzCash'
+      };
+      
+      const order = await orderService.createOrder(
+        cartItems,
+        total,
+        {}, // shippingDetails (would normally come from step 1 state)
+        methodMap[selectedPayment],
+        paymentProofUrl
+      );
+      
+      // Navigate to order confirmation
+      navigate('/order-confirmation', { state: { orderId: order.id } });
+    } catch (err) {
+      setUploadError('Failed to place order. Please try again.');
+      console.error(err);
+    }
+  };
 
   const handleNext = (e) => {
     e.preventDefault();
@@ -46,21 +124,7 @@ export default function Checkout({ cartItems = [] }) {
               {step === 1 && (
                 <div className="animate-in fade-in duration-500">
                   
-                  {/* Express Checkout */}
-                  <div className="mb-10 text-center">
-                    <p className="text-[11px] text-neutral-500 mb-3 tracking-wider uppercase font-semibold">Express checkout</p>
-                    <div className="flex gap-3 justify-center">
-                      <div className="w-full max-w-sm mx-auto">
-                        <PayPalPaymentForm total={total} shippingDetails={{}} />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="relative flex py-5 items-center mb-6">
-                    <div className="flex-grow border-t border-neutral-200"></div>
-                    <span className="flex-shrink-0 mx-4 text-neutral-500 text-[11px] uppercase tracking-widest font-semibold">OR</span>
-                    <div className="flex-grow border-t border-neutral-200"></div>
-                  </div>
+                  {/* Express Checkout section removed */}
 
                   {/* Contact */}
                   <div className="mb-8">
@@ -157,10 +221,94 @@ export default function Checkout({ cartItems = [] }) {
 
                   <h2 className="text-[20px] font-extrabold text-black mb-1">Payment</h2>
                   <p className="text-xs text-neutral-500 mb-6">All transactions are secure and encrypted.</p>
-                  
-                  <StripeCheckout total={total} shippingDetails={{}} />
+                                    {/* Unified Payment Options (Pill Buttons) */}
+                  <div className="flex flex-wrap gap-3 mb-8">
+                    <label className={`flex-1 min-w-[100px] sm:min-w-[120px] cursor-pointer flex items-center justify-center py-3 px-4 rounded-full font-bold text-sm border-2 transition-colors ${selectedPayment === 'card' ? 'bg-black text-white border-black' : 'bg-white border-neutral-200 text-neutral-700 hover:border-neutral-400'}`}>
+                      <input type="radio" name="payment_method" checked={selectedPayment === 'card'} onChange={() => setSelectedPayment('card')} className="sr-only" />
+                      Card
+                    </label>
+                    
+                    <label className={`flex-1 min-w-[100px] sm:min-w-[120px] cursor-pointer flex items-center justify-center py-3 px-4 rounded-full font-black italic tracking-wide text-sm border-2 transition-colors ${selectedPayment === 'paypal' ? 'bg-[#FFC439] text-[#003087] border-[#FFC439]' : 'bg-white border-neutral-200 text-[#003087] hover:border-[#FFC439]'}`}>
+                      <input type="radio" name="payment_method" checked={selectedPayment === 'paypal'} onChange={() => setSelectedPayment('paypal')} className="sr-only" />
+                      PayPal
+                    </label>
 
-                  <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                    <label className={`flex-1 min-w-[100px] sm:min-w-[120px] cursor-pointer flex items-center justify-center py-3 px-4 rounded-full font-bold text-sm border-2 transition-colors ${selectedPayment === 'bank_transfer' ? 'bg-black text-white border-black' : 'bg-white border-neutral-200 text-neutral-700 hover:border-neutral-400'}`}>
+                      <input type="radio" name="payment_method" checked={selectedPayment === 'bank_transfer'} onChange={() => setSelectedPayment('bank_transfer')} className="sr-only" />
+                      Bank Transfer
+                    </label>
+
+                    <label className={`flex-1 min-w-[100px] sm:min-w-[120px] cursor-pointer flex items-center justify-center py-3 px-4 rounded-full font-bold text-sm border-2 transition-colors ${selectedPayment === 'easypaisa' ? 'bg-[#40b15a] text-white border-[#40b15a]' : 'bg-white border-neutral-200 text-[#40b15a] hover:border-[#40b15a]'}`}>
+                      <input type="radio" name="payment_method" checked={selectedPayment === 'easypaisa'} onChange={() => setSelectedPayment('easypaisa')} className="sr-only" />
+                      EasyPaisa
+                    </label>
+
+                    <label className={`flex-1 min-w-[100px] sm:min-w-[120px] cursor-pointer flex items-center justify-center py-3 px-4 rounded-full font-bold text-sm border-2 transition-colors ${selectedPayment === 'jazzcash' ? 'bg-[#c52127] text-white border-[#c52127]' : 'bg-white border-neutral-200 text-[#c52127] hover:border-[#c52127]'}`}>
+                      <input type="radio" name="payment_method" checked={selectedPayment === 'jazzcash'} onChange={() => setSelectedPayment('jazzcash')} className="sr-only" />
+                      JazzCash
+                    </label>
+                  </div>
+
+                  {/* Payment Content */}
+                  <div className="mb-6 animate-in fade-in duration-300">
+                    {selectedPayment === 'card' && (
+                      <StripeCheckout total={total} shippingDetails={{}} />
+                    )}
+                    
+                    {selectedPayment === 'paypal' && (
+                       <PayPalPaymentForm total={total} shippingDetails={{}} />
+                    )}
+
+                    {['bank_transfer', 'easypaisa', 'jazzcash'].includes(selectedPayment) && (
+                      <div className="border border-neutral-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                        <div className="px-5 py-5">
+                          <div className="text-[13px] text-neutral-600 space-y-1.5 mb-5 p-4 bg-neutral-50 border border-neutral-200 rounded-lg">
+                            {selectedPayment === 'bank_transfer' && (
+                              <>
+                                <p><span className="text-neutral-400 w-24 inline-block">Bank Name:</span> <span className="font-bold text-black">[Your Bank]</span></p>
+                                <p><span className="text-neutral-400 w-24 inline-block">Account Title:</span> <span className="font-bold text-black">[Your Business Name]</span></p>
+                                <p><span className="text-neutral-400 w-24 inline-block">Account No:</span> <span className="font-bold text-black">[0000000000000]</span></p>
+                              </>
+                            )}
+                            {(selectedPayment === 'easypaisa' || selectedPayment === 'jazzcash') && (
+                              <p><span className="text-neutral-400 w-28 inline-block">Account No:</span> <span className="font-bold text-black">[03XXXXXXXXX]</span></p>
+                            )}
+                            <p className="mt-3 text-[12px] text-neutral-500 italic">Please send total amount and upload screenshot below.</p>
+                          </div>
+                          
+                          <div className="border-2 border-dashed border-neutral-300 rounded-lg p-5 text-center relative bg-white mb-5 hover:border-neutral-400 transition-colors">
+                            {isUploading ? (
+                              <span className="text-xs font-bold text-neutral-500">Uploading...</span>
+                            ) : paymentProofUrl ? (
+                              <div className="flex flex-col items-center gap-2">
+                                <span className="text-xs font-bold text-green-600">Screenshot uploaded!</span>
+                                <button type="button" onClick={() => setPaymentProofUrl('')} className="text-[11px] text-neutral-500 underline">Remove & upload different</button>
+                              </div>
+                            ) : (
+                              <>
+                                <input type="file" accept="image/*" onChange={handleFileUpload} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                                <span className="text-xs font-bold text-neutral-600 flex items-center justify-center gap-2">
+                                  <Upload className="w-4 h-4 text-neutral-400" /> Tap to upload screenshot
+                                </span>
+                              </>
+                            )}
+                          </div>
+                          {uploadError && <p className="text-red-500 text-xs font-bold mb-4 flex items-center gap-1.5"><AlertCircle className="w-3.5 h-3.5"/> {uploadError}</p>}
+                          
+                          <button 
+                            type="button" 
+                            onClick={handleManualPaymentSubmit}
+                            disabled={isUploading}
+                            className="w-full px-4 py-4 bg-black text-white rounded-lg font-extrabold text-[13px] tracking-wider uppercase hover:bg-neutral-800 transition-colors disabled:opacity-50"
+                          >
+                            Place Order
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="pt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                     <span className="text-[13px] text-neutral-600 hover:text-black flex items-center gap-1 cursor-pointer" onClick={() => setStep(1)}>
                       <ChevronRight className="w-3.5 h-3.5 rotate-180" /> Return to shipping
                     </span>

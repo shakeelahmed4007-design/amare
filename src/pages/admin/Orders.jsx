@@ -7,6 +7,7 @@ const formatCurrency = (amount) =>
 
 const STATUS_CONFIG = {
   pending:    { label: 'Pending',    cls: 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800', icon: Clock },
+  pending_payment_verification: { label: 'Pending Verification', cls: 'bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 border-orange-200 dark:border-orange-800', icon: AlertCircle },
   processing: { label: 'Processing', cls: 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800', icon: AlertCircle },
   shipped:    { label: 'Shipped',    cls: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800', icon: Truck },
   delivered:  { label: 'Delivered',  cls: 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-green-200 dark:border-green-800', icon: CheckCircle2 },
@@ -166,9 +167,26 @@ export function Orders() {
                       <td className="px-4 py-4 text-xs font-black text-neutral-900 dark:text-white whitespace-nowrap">
                         {formatCurrency(order.total_amount)}
                       </td>
-                      <td className="py-4 pl-4 pr-5 text-right">
-                        <button className="text-xs font-bold text-cyan-600 dark:text-cyan-400 hover:underline">
-                          View
+                      <td className="py-4 pl-4 pr-5 text-right space-y-2">
+                        {order.status === 'pending_payment_verification' && order.payment_proof_url && (
+                          <div className="flex flex-col items-end gap-2">
+                            <a href={order.payment_proof_url} target="_blank" rel="noreferrer" className="text-[10px] text-cyan-600 dark:text-cyan-400 hover:underline">
+                              View Proof
+                            </a>
+                            <button
+                              onClick={async () => {
+                                const { orderService } = await import('../../services/orderService');
+                                await orderService.verifyManualPayment(order.id);
+                                fetchOrders();
+                              }}
+                              className="px-2 py-1 text-[10px] bg-black text-white rounded font-bold hover:bg-neutral-800"
+                            >
+                              Verify Payment
+                            </button>
+                          </div>
+                        )}
+                        <button className="text-xs font-bold text-neutral-600 dark:text-neutral-400 hover:underline block ml-auto">
+                          View Details
                         </button>
                       </td>
                     </tr>
@@ -212,6 +230,23 @@ export function Orders() {
                       </select>
                     </div>
                   </div>
+                  {order.status === 'pending_payment_verification' && order.payment_proof_url && (
+                    <div className="pt-3 flex items-center justify-between border-t border-neutral-100 dark:border-slate-800">
+                      <a href={order.payment_proof_url} target="_blank" rel="noreferrer" className="text-[10px] font-bold text-cyan-600 dark:text-cyan-400 hover:underline">
+                        View Payment Proof
+                      </a>
+                      <button
+                        onClick={async () => {
+                          const { orderService } = await import('../../services/orderService');
+                          await orderService.verifyManualPayment(order.id);
+                          fetchOrders();
+                        }}
+                        className="px-3 py-1.5 text-xs bg-black text-white rounded-md font-bold hover:bg-neutral-800"
+                      >
+                        Verify Payment
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
