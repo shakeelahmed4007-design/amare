@@ -78,7 +78,6 @@ const mapToDB = (uiProduct) => {
       || (uiProduct.title || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''),
     description: uiProduct.description || null,
     price: Number(uiProduct.price) || 0,
-    sale_price: uiProduct.originalPrice ? Number(uiProduct.originalPrice) : null,
     stock_quantity: Number(uiProduct.stock_quantity) || 0,
     category_id: uiProduct.categoryId || null,
     image_url: imageUrl,
