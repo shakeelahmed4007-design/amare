@@ -1,19 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+// Anon key is intentionally public — security is enforced by Supabase RLS policies
+const SUPABASE_URL = 'https://lhxclmxwcehujkqbhglf.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxoeGNsbXh3Y2VodWprcWJoZ2xmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0NDE0NDEsImV4cCI6MjEwMjAxNzQ0MX0.Jrx0APyrM-STfyVPyr8vR93i3OYjHdyUTOSWRowHvIY'
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error(
-    '%c[Supabase] MISSING ENV VARS!',
-    'color:red;font-size:16px;font-weight:bold',
-    '\nVITE_SUPABASE_URL:', supabaseUrl || 'NOT SET',
-    '\nVITE_SUPABASE_ANON_KEY:', supabaseAnonKey ? 'SET' : 'NOT SET',
-    '\n\nFix: Add these to Vercel → Project → Settings → Environment Variables, then Redeploy.'
-  )
-}
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || SUPABASE_ANON_KEY
 
-export const supabase = createClient(
-  supabaseUrl || 'https://placeholder.supabase.co',
-  supabaseAnonKey || 'placeholder-key'
-)
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
