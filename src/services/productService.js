@@ -82,9 +82,7 @@ const mapToDB = (uiProduct) => {
     stock_quantity: Number(uiProduct.stock_quantity) || 0,
     category_id: uiProduct.categoryId || null,
     image_url: imageUrl,
-    images: imagesArray,
     status: dbStatus,
-    type: uiProduct.type || 'Physical',
   };
 
   return dbData;
@@ -150,8 +148,8 @@ export const productService = {
       .single();
 
     if (error) {
-      console.error('[productService] createProduct error:', error);
-      throw error;
+      console.error('[productService] createProduct error details:', JSON.stringify(error, null, 2));
+      throw new Error(error.message || 'Failed to create product');
     }
 
     // Insert variants if provided
