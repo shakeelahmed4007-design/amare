@@ -17,6 +17,7 @@ export function StoreProvider({ children }) {
   const [activeSubscription, setActiveSubscription] = useState(null); // Active plan for subscriber view
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [publicLoading, setPublicLoading] = useState(true);
   const [activityLogs, setActivityLogs] = useState([]);
 
   const logActivity = async (action, detail) => {
@@ -34,15 +35,34 @@ export function StoreProvider({ children }) {
     }
   };
 
+  // Load public storefront data (products + categories) on mount — no auth needed
   useEffect(() => {
-    // Auth Listener
+    async function loadPublicData() {
+      try {
+        const [prods, cats] = await Promise.all([
+          productService.getProducts(),
+          categoryService.getCategories()
+        ]);
+        setProducts(prods);
+        setCategories(cats);
+      } catch (err) {
+        console.error('Failed to load public data:', err);
+      } finally {
+        setPublicLoading(false);
+      }
+    }
+    loadPublicData();
+  }, []);
+
+  useEffect(() => {
+    // Auth Listener — only for admin features
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (session) {
           const profile = await authService.getCurrentProfile(session.user.id);
           if (profile && (profile.role === 'admin' || profile.role === 'staff')) {
             setUser({ ...session.user, role: profile.role, username: profile.full_name });
-            loadAllData();
+            loadAllData(); // Reload everything (including admin-only data like subscriptions)
           } else {
             setUser(null);
           }
@@ -214,6 +234,7 @@ export function StoreProvider({ children }) {
     setActiveSubscription,
     user,
     loading,
+    publicLoading,
     activityLogs,
     loginAdmin,
     logoutAdmin,
