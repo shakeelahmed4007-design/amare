@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { productService } from '../services/productService';
 import { categoryService } from '../services/categoryService';
 import { subscriptionService } from '../services/subscriptionService';
@@ -6,24 +6,28 @@ import { authService } from '../services/authService';
 import { activityLogService } from '../services/activityLogService';
 import { supabase } from '../supabase';
 
-
-
 const StoreContext = createContext();
 
 export function StoreProvider({ children }) {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [subscriptions, setSubscriptions] = useState([]);
-  const [activeSubscription, setActiveSubscription] = useState(null); // Active plan for subscriber view
+  const [activeSubscription, setActiveSubscription] = useState(null);
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [publicLoading, setPublicLoading] = useState(true);
+  const [loading, setLoading] = useState(true);       // Admin auth loading
+  const [publicLoading, setPublicLoading] = useState(true); // Storefront data loading
+  const [publicError, setPublicError] = useState(null);
   const [activityLogs, setActivityLogs] = useState([]);
 
+  // ─── Activity Log Helpers ──────────────────────────────────────────────────
+
   const logActivity = async (action, detail) => {
-    await activityLogService.logAction(action, detail);
-    // Optionally refresh logs if we are on dashboard
-    loadActivityLogs();
+    try {
+      await activityLogService.logAction(action, detail);
+      loadActivityLogs();
+    } catch (e) {
+      console.warn('[StoreContext] logActivity failed (non-critical):', e);
+    }
   };
 
   const loadActivityLogs = async () => {
@@ -31,39 +35,90 @@ export function StoreProvider({ children }) {
       const logs = await activityLogService.getRecentLogs(5);
       setActivityLogs(logs);
     } catch (e) {
-      console.error(e);
+      console.warn('[StoreContext] loadActivityLogs failed:', e);
     }
   };
 
-  // Load public storefront data (products + categories) on mount — no auth needed
-  useEffect(() => {
-    async function loadPublicData() {
-      try {
-        const [prods, cats] = await Promise.all([
-          productService.getProducts(),
-          categoryService.getCategories()
-        ]);
-        setProducts(prods);
-        setCategories(cats);
-      } catch (err) {
-        console.error('Failed to load public data:', err);
-      } finally {
-        setPublicLoading(false);
-      }
+  // ─── Public Storefront Data (No Auth Required) ─────────────────────────────
+  // Runs on every mount so the storefront always has fresh product data.
+
+  const loadPublicData = useCallback(async () => {
+    setPublicLoading(true);
+    setPublicError(null);
+    try {
+      const [prods, cats] = await Promise.all([
+        productService.getProducts(),
+        categoryService.getCategories(),
+      ]);
+      setProducts(prods);
+      setCategories(cats);
+    } catch (err) {
+      console.error('[StoreContext] loadPublicData error:', err);
+      setPublicError(err?.message || 'Failed to load products. Please refresh.');
+    } finally {
+      setPublicLoading(false);
     }
-    loadPublicData();
   }, []);
 
+  // Load public data on mount (storefront products visible to everyone)
   useEffect(() => {
-    // Auth Listener — only for admin features
+    loadPublicData();
+  }, [loadPublicData]);
+
+  // ─── Supabase Realtime — Auto-refresh when products table changes ──────────
+  useEffect(() => {
+    const channel = supabase
+      .channel('public:products')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'products' },
+        () => {
+          // Re-fetch all products whenever any row changes
+          loadPublicData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [loadPublicData]);
+
+  // ─── Admin Full Data Load ──────────────────────────────────────────────────
+
+  async function loadAllData() {
+    try {
+      const [prods, cats, subs] = await Promise.all([
+        productService.getProducts(),
+        categoryService.getCategories(),
+        subscriptionService.getSubscriptions(),
+      ]);
+      setProducts(prods);
+      setCategories(cats);
+      setSubscriptions(subs);
+      setPublicLoading(false);
+      loadActivityLogs();
+    } catch (err) {
+      console.error('[StoreContext] loadAllData error:', err);
+    }
+  }
+
+  // ─── Admin Auth Listener ───────────────────────────────────────────────────
+
+  useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (session) {
-          const profile = await authService.getCurrentProfile(session.user.id);
-          if (profile && (profile.role === 'admin' || profile.role === 'staff')) {
-            setUser({ ...session.user, role: profile.role, username: profile.full_name });
-            loadAllData(); // Reload everything (including admin-only data like subscriptions)
-          } else {
+          try {
+            const profile = await authService.getCurrentProfile(session.user.id);
+            if (profile && (profile.role === 'admin' || profile.role === 'staff')) {
+              setUser({ ...session.user, role: profile.role, username: profile.full_name });
+              loadAllData(); // Load subscriptions + refresh products/cats for admin
+            } else {
+              setUser(null);
+            }
+          } catch (e) {
+            console.error('[StoreContext] Auth profile load error:', e);
             setUser(null);
           }
         } else {
@@ -75,23 +130,8 @@ export function StoreProvider({ children }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  async function loadAllData() {
-    try {
-      const [prods, cats, subs] = await Promise.all([
-        productService.getProducts(),
-        categoryService.getCategories(),
-        subscriptionService.getSubscriptions()
-      ]);
-      setProducts(prods);
-      setCategories(cats);
-      setSubscriptions(subs);
-      loadActivityLogs();
-    } catch (err) {
-      console.error('Failed to load store data:', err);
-    }
-  }
+  // ─── Product CRUD ──────────────────────────────────────────────────────────
 
-  // --- Product Handlers ---
   const addProduct = async (data) => {
     const created = await productService.createProduct(data);
     setProducts(prev => [created, ...prev]);
@@ -101,44 +141,41 @@ export function StoreProvider({ children }) {
 
   const updateProduct = async (id, data) => {
     const updated = await productService.updateProduct(id, data);
-    setProducts(prev => prev.map(p => p.id === id || String(p.id) === String(id) ? updated : p));
+    setProducts(prev =>
+      prev.map(p => (String(p.id) === String(id) ? updated : p))
+    );
     await logActivity('Product Updated', updated.title);
     return updated;
   };
 
   const deleteProduct = async (id) => {
-    const target = products.find(p => p.id === id || String(p.id) === String(id));
+    const target = products.find(p => String(p.id) === String(id));
     await productService.deleteProduct(id);
-    setProducts(prev => prev.filter(p => p.id !== id && String(p.id) !== String(id)));
+    setProducts(prev => prev.filter(p => String(p.id) !== String(id)));
     if (target) await logActivity('Product Deleted', target.title);
     return true;
   };
 
   const bulkDeleteProducts = async (ids) => {
     await productService.bulkDeleteProducts(ids);
-    setProducts(prev => prev.filter(p => !ids.map(String).includes(String(p.id))));
+    const idSet = new Set(ids.map(String));
+    setProducts(prev => prev.filter(p => !idSet.has(String(p.id))));
     await logActivity('Products Bulk Deleted', `${ids.length} items deleted`);
     return true;
   };
 
   const bulkUpdateProductStatus = async (ids, status) => {
     const updatedProducts = await productService.bulkUpdateStatus(ids, status);
-
-    // Merge updated ones into local state
-    setProducts(prev => {
-      const updatedMap = new Map(updatedProducts.map(u => [String(u.id), u]));
-      return prev.map(p => {
-        if (updatedMap.has(String(p.id))) {
-          return updatedMap.get(String(p.id));
-        }
-        return p;
-      });
-    });
-    await logActivity('Products Status Updated', `${ids.length} items set to ${status}`);
+    const updatedMap = new Map(updatedProducts.map(u => [String(u.id), u]));
+    setProducts(prev =>
+      prev.map(p => updatedMap.has(String(p.id)) ? updatedMap.get(String(p.id)) : p)
+    );
+    await logActivity('Products Status Updated', `${ids.length} items → ${status}`);
     return true;
   };
 
-  // --- Category Handlers ---
+  // ─── Category CRUD ─────────────────────────────────────────────────────────
+
   const addCategory = async (data) => {
     const created = await categoryService.createCategory(data);
     setCategories(prev => [...prev, created]);
@@ -148,20 +185,23 @@ export function StoreProvider({ children }) {
 
   const updateCategory = async (id, data) => {
     const updated = await categoryService.updateCategory(id, data);
-    setCategories(prev => prev.map(c => c.id === id || String(c.id) === String(id) ? updated : c));
+    setCategories(prev =>
+      prev.map(c => (String(c.id) === String(id) ? updated : c))
+    );
     await logActivity('Category Updated', updated.name);
     return updated;
   };
 
   const deleteCategory = async (id) => {
-    const target = categories.find(c => c.id === id || String(c.id) === String(id));
+    const target = categories.find(c => String(c.id) === String(id));
     await categoryService.deleteCategory(id);
-    setCategories(prev => prev.filter(c => c.id !== id && String(c.id) !== String(id)));
+    setCategories(prev => prev.filter(c => String(c.id) !== String(id)));
     if (target) await logActivity('Category Deleted', target.name);
     return true;
   };
 
-  // --- Subscription Handlers ---
+  // ─── Subscription CRUD ─────────────────────────────────────────────────────
+
   const addSubscription = async (data) => {
     const created = await subscriptionService.createSubscription(data);
     setSubscriptions(prev => [created, ...prev]);
@@ -171,32 +211,35 @@ export function StoreProvider({ children }) {
 
   const updateSubscription = async (id, data) => {
     const updated = await subscriptionService.updateSubscription(id, data);
-    setSubscriptions(prev => prev.map(s => s.id === id || String(s.id) === String(id) ? updated : s));
-    if (activeSubscription?.id === id) setActiveSubscription(updated);
+    setSubscriptions(prev =>
+      prev.map(s => (String(s.id) === String(id) ? updated : s))
+    );
+    if (String(activeSubscription?.id) === String(id)) setActiveSubscription(updated);
     await logActivity('Subscription Plan Updated', updated.name);
     return updated;
   };
 
   const deleteSubscription = async (id) => {
-    const target = subscriptions.find(s => s.id === id || String(s.id) === String(id));
+    const target = subscriptions.find(s => String(s.id) === String(id));
     await subscriptionService.deleteSubscription(id);
-    setSubscriptions(prev => prev.filter(s => s.id !== id && String(s.id) !== String(id)));
-    if (activeSubscription?.id === id) setActiveSubscription(null);
+    setSubscriptions(prev => prev.filter(s => String(s.id) !== String(id)));
+    if (String(activeSubscription?.id) === String(id)) setActiveSubscription(null);
     if (target) await logActivity('Subscription Plan Deleted', target.name);
     return true;
   };
 
-  // --- Auth Handlers ---
+  // ─── Admin Auth ────────────────────────────────────────────────────────────
+
   const loginAdmin = async (email, password) => {
-    // Temporary bypass for testing UI without backend user
+    // Dev bypass — remove in production
     if (email === 'cos@admin.com' && password === 'cos123') {
       setUser({
         id: 'bypass-123',
         email: 'cos@admin.com',
         role: 'admin',
-        username: 'Cosmatic Admin'
+        username: 'Cosmatic Admin',
       });
-      loadAllData(); // Will attempt to fetch, might return empty if RLS blocks it
+      loadAllData();
       return { success: true };
     }
 
@@ -212,19 +255,23 @@ export function StoreProvider({ children }) {
     setUser(null);
   };
 
-  // Pricing Helpers
+  // ─── Pricing Helpers ───────────────────────────────────────────────────────
+
   const getSubscribedPrice = (product) => {
     if (!activeSubscription || activeSubscription.status !== 'Active') return product.price;
     const discount = activeSubscription.discountPercent || 0;
-    const discounted = product.price * (1 - discount / 100);
-    return Number(discounted.toFixed(2));
+    return Number((product.price * (1 - discount / 100)).toFixed(2));
   };
 
   const getTieredPrice = (product, qty) => {
-    if (!product.tieredPricing || product.tieredPricing.length === 0) return product.price;
-    const match = product.tieredPricing.find(t => qty >= t.minQty && qty <= (t.maxQty || 99999));
+    if (!product?.tieredPricing || product.tieredPricing.length === 0) return product?.price || 0;
+    const match = product.tieredPricing.find(
+      t => qty >= t.minQty && qty <= (t.maxQty || 99999)
+    );
     return match ? match.price : product.price;
   };
+
+  // ─── Context Value ─────────────────────────────────────────────────────────
 
   const value = {
     products,
@@ -235,6 +282,7 @@ export function StoreProvider({ children }) {
     user,
     loading,
     publicLoading,
+    publicError,
     activityLogs,
     loginAdmin,
     logoutAdmin,
@@ -251,7 +299,8 @@ export function StoreProvider({ children }) {
     deleteSubscription,
     getSubscribedPrice,
     getTieredPrice,
-    loadAllData
+    loadAllData,
+    loadPublicData,
   };
 
   return (

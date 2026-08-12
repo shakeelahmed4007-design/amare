@@ -32,9 +32,10 @@ const categoryFallbacks = {
 
 export default function Product({ onAddToCart }) {
   const { id } = useParams();
-  const { products, getSubscribedPrice, getTieredPrice } = useStore();
+  const { products, publicLoading, getSubscribedPrice, getTieredPrice } = useStore();
 
-  const targetProduct = products.find(p => String(p.id) === String(id)) || products[0];
+  const targetProduct = products.find(p => String(p.id) === String(id));
+
 
   const getFallbackImages = (p) => {
     if (!p) return [];
@@ -74,12 +75,37 @@ export default function Product({ onAddToCart }) {
     setOpenAccordion(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
+  // Show loading spinner while Supabase data is loading
+  if (publicLoading && !targetProduct) {
+    return (
+      <div className="py-32 flex flex-col items-center justify-center gap-4">
+        <div className="w-10 h-10 border-4 border-black border-t-transparent rounded-full animate-spin" />
+        <p className="text-sm text-neutral-500 font-semibold">Loading product...</p>
+      </div>
+    );
+  }
+
+  // Show not-found after loading is done and product still not found
+  if (!publicLoading && !targetProduct) {
+    return (
+      <div className="py-32 text-center">
+        <p className="text-2xl font-black text-neutral-800 mb-2">Product Not Found</p>
+        <p className="text-sm text-neutral-500 mb-6">This product may have been removed or the link is incorrect.</p>
+        <a href="/shop" className="inline-block px-6 py-3 bg-black text-white text-xs font-black uppercase rounded-full tracking-widest hover:bg-neutral-800 transition-colors">
+          Back to Shop
+        </a>
+      </div>
+    );
+  }
+
+  if (!targetProduct) return null; // Safety guard during transition
+
   // Base price
   const basePrice = getTieredPrice(targetProduct, quantity);
   const subscribePrice = getSubscribedPrice({ ...targetProduct, price: basePrice });
 
   const finalUnitPrice = purchaseType === 'subscribe' ? subscribePrice : basePrice;
-  const originalPrice = targetProduct.originalPrice || (basePrice * 1.2).toFixed(2); // Mock original price if missing
+  const originalPrice = targetProduct?.originalPrice || (basePrice * 1.2).toFixed(2);
 
   const handleAdd = () => {
     for (let i = 0; i < quantity; i++) {
@@ -92,8 +118,6 @@ export default function Product({ onAddToCart }) {
       });
     }
   };
-
-  if (!targetProduct) return <div className="py-20 text-center text-neutral-500 font-bold">Product not found</div>;
 
   return (
     <div className="bg-white min-h-screen font-sans pb-24">

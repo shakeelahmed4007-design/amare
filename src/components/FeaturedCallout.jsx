@@ -1,23 +1,36 @@
 import React, { useState } from 'react';
-import { featuredCallouts } from '../data/products';
-import { Star, Check, ShoppingBag, Sparkles } from 'lucide-react';
+import { Star, Check, ShoppingBag, Sparkles, Package } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useStore } from '../contexts/StoreContext';
 
 import step1Img from '../assets/Shampoo.PNG';
 import step2Img from '../assets/mid.PNG';
 import step3Img from '../assets/result.PNG';
 
+const stepImages = [step1Img, step2Img, step3Img];
+
+const stepData = [
+  {
+    heading: '1. PREP & GRIP',
+    subheading: 'Start with a powerhouse primer for all-day makeup hold.',
+  },
+  {
+    heading: '2. GLOW & BASE',
+    subheading: 'Layer a glow liquid filter for an effortless soft-focus glow.',
+  },
+  {
+    heading: '3. SET & LOCK',
+    subheading: 'Finish with a setting mist to lock in your glow for hours.',
+  },
+];
 
 const MiniProductCard = ({ product, onAddToCart }) => {
-  const [selectedShade, setSelectedShade] = useState(product.shades ? product.shades[0] : null);
   const [added, setAdded] = useState(false);
 
   const handleAdd = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (onAddToCart) {
-      onAddToCart({ ...product, selectedShade });
-    }
+    if (onAddToCart) onAddToCart(product);
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
   };
@@ -25,13 +38,20 @@ const MiniProductCard = ({ product, onAddToCart }) => {
   return (
     <div className="flex gap-3 items-center w-full bg-neutral-50 rounded-xl p-3 border border-neutral-200/80 hover:border-neutral-300 transition-all">
       {/* Mini Image */}
-      <Link to={`/product/${product.id}`} className="shrink-0 w-[64px] h-[64px] bg-white rounded-lg p-1 border border-neutral-100 flex items-center justify-center overflow-hidden">
-        <img
-          src={product.image || (product.images && product.images[0]) || ''}
-          alt={product.title}
-          loading="lazy"
-          className="w-full h-full object-cover rounded-md group-hover:scale-105 transition-transform"
-        />
+      <Link
+        to={`/product/${product.id}`}
+        className="shrink-0 w-[64px] h-[64px] bg-white rounded-lg p-1 border border-neutral-100 flex items-center justify-center overflow-hidden"
+      >
+        {product.image || (product.images && product.images[0]) ? (
+          <img
+            src={product.image || product.images[0]}
+            alt={product.title}
+            loading="lazy"
+            className="w-full h-full object-cover rounded-md"
+          />
+        ) : (
+          <Package className="w-7 h-7 text-neutral-300" />
+        )}
       </Link>
 
       {/* Mini Details */}
@@ -42,11 +62,17 @@ const MiniProductCard = ({ product, onAddToCart }) => {
             {[...Array(5)].map((_, i) => (
               <Star
                 key={i}
-                className={`w-3 h-3 ${i < Math.floor(product.rating || 5) ? 'fill-amber-400 text-amber-400' : 'fill-neutral-200 text-neutral-200'}`}
+                className={`w-3 h-3 ${
+                  i < Math.floor(product.rating || 5)
+                    ? 'fill-amber-400 text-amber-400'
+                    : 'fill-neutral-200 text-neutral-200'
+                }`}
               />
             ))}
           </div>
-          <span className="text-[10px] font-bold text-neutral-600">({product.reviews})</span>
+          {product.reviews && (
+            <span className="text-[10px] font-bold text-neutral-600">({product.reviews})</span>
+          )}
         </div>
 
         {/* Title */}
@@ -58,16 +84,12 @@ const MiniProductCard = ({ product, onAddToCart }) => {
 
         {/* Price & Action Button */}
         <div className="flex items-center justify-between mt-2 gap-2">
-          <span className="text-xs font-black text-black">
-            ${product.price}
-          </span>
-
+          <span className="text-xs font-black text-black">${product.price}</span>
           <button
             onClick={handleAdd}
-            className={`font-black text-[10px] py-1.5 px-3 rounded-full uppercase tracking-wider transition-all duration-200 flex items-center gap-1 ${added
-                ? 'bg-emerald-600 text-white'
-                : 'bg-black text-white hover:bg-neutral-800'
-              }`}
+            className={`font-black text-[10px] py-1.5 px-3 rounded-full uppercase tracking-wider transition-all duration-200 flex items-center gap-1 ${
+              added ? 'bg-emerald-600 text-white' : 'bg-black text-white hover:bg-neutral-800'
+            }`}
           >
             {added ? (
               <>
@@ -87,12 +109,24 @@ const MiniProductCard = ({ product, onAddToCart }) => {
   );
 };
 
+// Skeleton placeholder for loading state
+const MiniProductSkeleton = () => (
+  <div className="flex gap-3 items-center w-full bg-neutral-50 rounded-xl p-3 border border-neutral-200/80 animate-pulse">
+    <div className="shrink-0 w-[64px] h-[64px] bg-neutral-200 rounded-lg" />
+    <div className="flex-1 space-y-2">
+      <div className="h-3 bg-neutral-200 rounded w-3/4" />
+      <div className="h-3 bg-neutral-200 rounded w-1/2" />
+      <div className="h-6 bg-neutral-200 rounded w-full" />
+    </div>
+  </div>
+);
+
 export default function FeaturedCallout({ onAddToCart }) {
-  const stepImages = [
-    step1Img,
-    step2Img,
-    step3Img
-  ];
+  const { products, publicLoading } = useStore();
+
+  // Use the first 3 active products from Supabase as "routine" products
+  const activeProducts = products.filter(p => !p.status || p.status === 'Active');
+  const routineProducts = activeProducts.slice(0, 3);
 
   return (
     <section className="py-14 px-4 sm:px-8 max-w-[1440px] mx-auto">
@@ -110,40 +144,65 @@ export default function FeaturedCallout({ onAddToCart }) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-        {featuredCallouts.map((item, idx) => (
-          <div key={idx} className="bg-white rounded-2xl border border-neutral-200 p-4 sm:p-5 flex flex-col justify-between hover:shadow-xl hover:border-neutral-300 transition-all duration-300 group">
-
-            {/* Step Image */}
-            <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden mb-4 bg-neutral-100 p-4 group/img">
-              <img
-                src={stepImages[idx] || item.product.image || (item.product.images && item.product.images[0]) || ''}
-                alt={item.heading}
-                loading="lazy"
-                className="w-full h-full object-contain group-hover/img:scale-105 transition-transform duration-500"
-              />
-              <div className="absolute top-3 left-3 bg-black text-white text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow-md">
-                Step {idx + 1}
+        {publicLoading
+          ? stepData.map((step, idx) => (
+              <div
+                key={idx}
+                className="bg-white rounded-2xl border border-neutral-200 p-4 sm:p-5 flex flex-col justify-between"
+              >
+                {/* Step Image placeholder */}
+                <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden mb-4 bg-neutral-100 animate-pulse" />
+                <div className="mb-4 space-y-2 animate-pulse">
+                  <div className="h-4 bg-neutral-200 rounded w-2/3" />
+                  <div className="h-3 bg-neutral-200 rounded w-full" />
+                </div>
+                <MiniProductSkeleton />
               </div>
-            </div>
+            ))
+          : stepData.map((step, idx) => {
+              const product = routineProducts[idx];
+              return (
+                <div
+                  key={idx}
+                  className="bg-white rounded-2xl border border-neutral-200 p-4 sm:p-5 flex flex-col justify-between hover:shadow-xl hover:border-neutral-300 transition-all duration-300 group"
+                >
+                  {/* Step Image */}
+                  <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden mb-4 bg-neutral-100 p-4 group/img">
+                    <img
+                      src={
+                        stepImages[idx] ||
+                        (product?.image) ||
+                        (product?.images?.[0]) ||
+                        ''
+                      }
+                      alt={step.heading}
+                      loading="lazy"
+                      className="w-full h-full object-contain group-hover/img:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute top-3 left-3 bg-black text-white text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow-md">
+                      Step {idx + 1}
+                    </div>
+                  </div>
 
-            {/* Content Text */}
-            <div className="mb-4 flex-grow">
-              <h3 className="text-lg font-black text-black mb-1">
-                {item.heading}
-              </h3>
-              <p className="text-xs text-neutral-500 leading-relaxed font-normal">
-                {item.subheading}
-              </p>
-            </div>
+                  {/* Content Text */}
+                  <div className="mb-4 flex-grow">
+                    <h3 className="text-lg font-black text-black mb-1">{step.heading}</h3>
+                    <p className="text-xs text-neutral-500 leading-relaxed font-normal">
+                      {step.subheading}
+                    </p>
+                  </div>
 
-            {/* Mini Product Card Component */}
-            <MiniProductCard
-              product={item.product}
-              onAddToCart={onAddToCart}
-            />
-
-          </div>
-        ))}
+                  {/* Product Card — real Supabase data or placeholder */}
+                  {product ? (
+                    <MiniProductCard product={product} onAddToCart={onAddToCart} />
+                  ) : (
+                    <div className="text-center py-3 text-xs text-neutral-400 italic border border-dashed border-neutral-200 rounded-xl">
+                      No product assigned yet
+                    </div>
+                  )}
+                </div>
+              );
+            })}
       </div>
     </section>
   );

@@ -2,17 +2,19 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Minus, Plus, Trash2, ShoppingBag, Diamond, Tag, Star, Gift } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { products } from '../data/products';
+import { useStore } from '../contexts/StoreContext';
 
 export default function CartDrawer({ isOpen, onClose, cartItems = [], onUpdateQuantity, onRemoveItem }) {
   const [activeTab, setActiveTab] = useState('bag');
+  const { products } = useStore();
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const freeShippingThreshold = 35;
   const progress = Math.min((subtotal / freeShippingThreshold) * 100, 100);
 
-  // Use a couple of products for Trending Now
-  const trendingProducts = products.slice(7, 9); // Power Grip Primer + 4% Niacinamide, Power Grip Matte Primer
+  // Use active Supabase products for Trending Now section
+  const activeProducts = products.filter(p => !p.status || p.status === 'Active');
+  const trendingProducts = activeProducts.slice(0, 2);
 
   const renderBagTab = () => {
     if (cartItems.length === 0) {
@@ -34,43 +36,52 @@ export default function CartDrawer({ isOpen, onClose, cartItems = [], onUpdateQu
 
           <div className="mt-4">
             <h4 className="font-extrabold text-[17px] text-black mb-4">Trending Now</h4>
-            <div className="grid grid-cols-2 gap-3 sm:gap-4">
-              {trendingProducts.map(prod => (
-                <div key={prod.id} className="bg-white p-3 rounded shadow-sm border border-neutral-100 flex flex-col group cursor-pointer">
-                  <img src={prod.image} alt={prod.title} className="w-full aspect-[3/4] object-contain mix-blend-multiply mb-3 group-hover:scale-105 transition-transform" />
-                  <div className="flex space-x-[1px] mb-1.5">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-2.5 h-2.5 ${i < Math.floor(prod.rating) ? 'fill-neutral-700 text-neutral-700' : 'fill-neutral-200 text-neutral-200'}`}
-                      />
-                    ))}
-                    <span className="text-[10px] text-neutral-500 ml-1">({prod.reviews})</span>
-                  </div>
-                  <h5 className="text-[13px] font-medium leading-tight mb-2 flex-grow text-black">
-                    {prod.title}
-                  </h5>
-                  <p className="text-[11px] text-neutral-600 leading-snug mb-3 line-clamp-2 min-h-[32px]">
-                    {prod.description}
-                  </p>
-                  <div className="flex items-center gap-1.5 mb-3">
-                    {prod.originalPrice && (
-                      <span className="text-xs font-bold text-neutral-400 line-through">
-                        ${prod.originalPrice}
+            {trendingProducts.length === 0 ? (
+              <p className="text-xs text-neutral-400 italic text-center py-4">No products available</p>
+            ) : (
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                {trendingProducts.map(prod => (
+                  <Link key={prod.id} to={`/product/${prod.id}`} onClick={onClose} className="bg-white p-3 rounded shadow-sm border border-neutral-100 flex flex-col group cursor-pointer hover:border-neutral-300 transition-colors">
+                    <img
+                      src={prod.image || (prod.images && prod.images[0]) || ''}
+                      alt={prod.title}
+                      className="w-full aspect-[3/4] object-contain mix-blend-multiply mb-3 group-hover:scale-105 transition-transform"
+                    />
+                    <div className="flex space-x-[1px] mb-1.5">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-2.5 h-2.5 ${i < Math.floor(prod.rating || 5) ? 'fill-neutral-700 text-neutral-700' : 'fill-neutral-200 text-neutral-200'}`}
+                        />
+                      ))}
+                      {prod.reviews && <span className="text-[10px] text-neutral-500 ml-1">({prod.reviews})</span>}
+                    </div>
+                    <h5 className="text-[13px] font-medium leading-tight mb-2 flex-grow text-black">
+                      {prod.title}
+                    </h5>
+                    <p className="text-[11px] text-neutral-600 leading-snug mb-3 line-clamp-2 min-h-[32px]">
+                      {prod.description}
+                    </p>
+                    <div className="flex items-center gap-1.5 mb-3">
+                      {prod.originalPrice && (
+                        <span className="text-xs font-bold text-neutral-400 line-through">
+                          ${prod.originalPrice}
+                        </span>
+                      )}
+                      <span className="text-sm font-extrabold text-black">
+                        ${prod.price}
                       </span>
-                    )}
-                    <span className="text-sm font-extrabold text-black">
-                      ${prod.price}
-                    </span>
-                  </div>
-                  <button className="w-full border border-black text-black font-extrabold text-[10px] sm:text-xs py-2 rounded-full uppercase tracking-wider hover:bg-black hover:text-white transition-colors">
-                    SELECT SIZE
-                  </button>
-                </div>
-              ))}
-            </div>
+                    </div>
+                    <button className="w-full border border-black text-black font-extrabold text-[10px] sm:text-xs py-2 rounded-full uppercase tracking-wider hover:bg-black hover:text-white transition-colors">
+                      VIEW PRODUCT
+                    </button>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </div>
+
       );
     }
 
