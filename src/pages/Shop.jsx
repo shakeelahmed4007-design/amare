@@ -5,7 +5,7 @@ import { useStore } from '../contexts/StoreContext';
 import { Sparkles, TicketPercent } from 'lucide-react';
 
 export default function Shop({ onAddToCart }) {
-  const { products, categories, activeSubscription, getSubscribedPrice, loading } = useStore();
+  const { products, categories, activeSubscription, getSubscribedPrice, publicLoading, publicError } = useStore();
   const [searchParams, setSearchParams] = useSearchParams();
   
   const selectedCat = searchParams.get('cat') || 'all';
@@ -95,8 +95,31 @@ export default function Shop({ onAddToCart }) {
       </div>
 
       {/* Products Grid */}
-      {loading ? (
-        <div className="text-center py-20 text-neutral-500 font-bold">Loading storefront catalog...</div>
+      {publicLoading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 justify-items-center">
+          {[...Array(10)].map((_, i) => (
+            <div key={i} className="w-full max-w-[320px] border-2 border-neutral-100 animate-pulse">
+              <div className="aspect-square bg-neutral-100" />
+              <div className="p-4 space-y-3">
+                <div className="h-3 bg-neutral-100 rounded w-2/3" />
+                <div className="h-4 bg-neutral-100 rounded w-full" />
+                <div className="h-3 bg-neutral-100 rounded w-3/4" />
+                <div className="flex justify-between items-center pt-2">
+                  <div className="h-8 w-28 bg-neutral-100 rounded-full" />
+                  <div className="h-5 w-12 bg-neutral-100 rounded" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : publicError ? (
+        <div className="text-center py-20 space-y-3">
+          <p className="text-red-500 font-bold text-base">{publicError}</p>
+          <p className="text-neutral-400 text-sm">Could not connect to store database. Please try again.</p>
+          <button onClick={() => window.location.reload()} className="px-6 py-2.5 bg-black text-white text-xs font-black uppercase rounded-full hover:bg-neutral-800 transition-colors">
+            Retry
+          </button>
+        </div>
       ) : filteredProducts.length === 0 ? (
         <div className="text-center py-20 text-neutral-500 font-bold">No products found in this category.</div>
       ) : (

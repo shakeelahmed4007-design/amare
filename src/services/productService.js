@@ -93,7 +93,10 @@ const mapToDB = (uiProduct) => {
 export const productService = {
   /**
    * Fetch all products with category info and variants.
-   * Public-safe: relies on Supabase RLS "Public read products" policy.
+   * NOTE: We fetch ALL products here (no status filter in query).
+   * The mapToUI function converts DB status to UI status,
+   * and the frontend filters for 'Active' status before display.
+   * RLS "Public read products" policy also enforces status = 'active' on DB side.
    */
   async getProducts() {
     const { data, error } = await supabase
